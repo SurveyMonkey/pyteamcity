@@ -1,4 +1,3 @@
-#!/usr/bin/python
 
 """
 RESTful api definition: http://${TeamCity}/guestAuth/app/rest/application.wadl
