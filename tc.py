@@ -11,8 +11,8 @@ import pprint
 
 class TeamCityRESTApiClient:
 
-    def __init__(self, username, password, url, port):
-        self.TC_REST_URL = "http://%s/httpAuth/app/rest/:%d" % (url, port)
+    def __init__(self, username, password, server, port):
+        self.TC_REST_URL = "http://%s:%d/httpAuth/app/rest/" % (server, port)
         self.userpass = '%s:%s' % (username, password)
         self.locators = {}
 
@@ -134,8 +134,8 @@ class TeamCityRESTApiClient:
         return self.set_resource('builds')
 
     # btId = bt[0-9]+
-    def get_all_builds_by_build_type_id(self, btId):
-        return self.set_resource('buildTypes/id:%s/builds/' % btId)
+    def get_all_builds_by_build_type_id(self, btId,start=0,count=100):
+        return self.set_resource('buildTypes/id:%s/builds/?count=%d&start=%d' % (btId,count,start))
 
     # bId = [0-9]+
     def get_build_by_build_id(self, bId):
