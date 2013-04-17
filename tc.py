@@ -130,8 +130,8 @@ class TeamCityRESTApiClient:
     def get_all_plugins(self):
         return self.set_resource('server/plugins')
 
-    def get_all_builds(self):
-        return self.set_resource('builds')
+    def get_all_builds(self,start=0,count=100):
+        return self.set_resource('builds/?count=%d&start=%d'% (count,start))
 
     # btId = bt[0-9]+
     def get_all_builds_by_build_type_id(self, btId,start=0,count=100):
