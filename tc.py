@@ -6,8 +6,8 @@ RESTful api definition: http://${TeamCity}/guestAuth/app/rest/application.wadl
 import json
 import urllib2
 import base64
-from datetime import datetime,timedelta
-import pprint
+from datetime import datetime, timedelta
+
 
 class TeamCityRESTApiClient:
 
@@ -15,10 +15,11 @@ class TeamCityRESTApiClient:
         self.TC_REST_URL = "http://%s:%d/httpAuth/app/rest/" % (server, port)
         self.userpass = '%s:%s' % (username, password)
         self.locators = {}
+        self.parameters = {}
 
     # count:<number> - serve only the specified number of builds
     def set_count(self, count):
-        self.locators['count'] = count
+        self.parameters['count'] = count
         return self
 
     # running:<true/false/any> - limit the builds by running flag.
@@ -87,7 +88,7 @@ class TeamCityRESTApiClient:
 
     # start:<number> - list the builds from the list starting from the position specified (zero-based)
     def set_start(self, start):
-        self.locators['start'] = start
+        self.parameters['start'] = start
         return self
 
     # lookupLimit:<number> - since TeamCity 7.0 limit processing to the latest N builds only. If none of the latest N builds match other specified criteria of the build locator, 404 response is returned.
@@ -105,10 +106,19 @@ class TeamCityRESTApiClient:
 
     def compose_resource_path(self):
         full_resource_url = self.resource
-        if len(self.locators) > 0:
-            # print self.locators
-            locators ='?locator=' + ','.join(["%s:%s" % (k, v) for k, v in self.locators.iteritems()])
-            full_resource_url = full_resource_url + locators
+        if self.locators:
+            locators = 'locator=' + ','.join([
+                "%s:%s" % (k, v)
+                for k, v in self.locators.iteritems()
+            ])
+        else:
+            locators = ''
+        get_args = '&'.join([locators] + [
+            '%s=%s' % (k, v)
+            for k, v in self.parameters.iteritems()
+        ])
+        if get_args:
+            full_resource_url = full_resource_url + '?' + get_args
         return full_resource_url
 
     def get_from_server(self):
@@ -130,12 +140,16 @@ class TeamCityRESTApiClient:
     def get_all_plugins(self):
         return self.set_resource('server/plugins')
 
-    def get_all_builds(self,start=0,count=100):
-        return self.set_resource('builds/?count=%d&start=%d'% (count,start))
+    def get_all_builds(self, start=0, count=100):
+        self.set_start(start)
+        self.set_count(count)
+        return self.set_resource('builds/')
 
     # btId = bt[0-9]+
-    def get_all_builds_by_build_type_id(self, btId,start=0,count=100):
-        return self.set_resource('buildTypes/id:%s/builds/?count=%d&start=%d' % (btId,count,start))
+    def get_all_builds_by_build_type_id(self, btId, start=0, count=100):
+        self.set_count(count)
+        self.set_start(start)
+        return self.set_resource('buildTypes/id:%s/builds/' % (btId))
 
     # bId = [0-9]+
     def get_build_by_build_id(self, bId):
@@ -149,7 +163,8 @@ class TeamCityRESTApiClient:
 
     # bId = [0-9]+
     def get_changes_by_build_id(self, bId):
-        return self.set_resource('changes?build=id:%s' % bId)
+        self.parameters['build'] = 'id:%s' % (bId)
+        return self.set_resource('changes')
 
     def get_all_build_types(self):
         return self.set_resource('buildTypes')
