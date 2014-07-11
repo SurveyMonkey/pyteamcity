@@ -18,6 +18,11 @@ class TeamCityRESTApiClient:
 
     # count:<number> - serve only the specified number of builds
     def set_count(self, count):
+        """
+
+        :param count:
+        :return:
+        """
         self.parameters['count'] = count
         return self
 
@@ -121,6 +126,11 @@ class TeamCityRESTApiClient:
 
 
     def compose_resource_path(self):
+        """
+        Creates the URL by appending the resource, locators, and arguments in the appropriate places.
+
+        :return: the well-built URL to make the request with.
+        """
         full_resource_url = self.resource
         if self.locators:
             locators = 'locator=' + ','.join([
@@ -137,8 +147,15 @@ class TeamCityRESTApiClient:
             full_resource_url = full_resource_url + '?' + get_args
         return full_resource_url
 
-
     def get_from_server(self):
+        """
+        Makes a request to the TeamCity server pointed to by this instance of the Client.
+        Uses httpAuth and accepts a JSON return.
+
+        Then it creates a Python dictionary by loading in the JSON.
+
+        :return: the Python dictionary which represents the JSON response.
+        """
         full_resource_url = self.compose_resource_path()
         print full_resource_url
         req = urllib2.Request(full_resource_url)
@@ -153,87 +170,179 @@ class TeamCityRESTApiClient:
 
 
     def get_server_info(self):
+        """
+        Gets server info of the TeamCity server pointed to by this instance of the Client.
+
+        :return: an instance of the Client with `resource = <url>/server`.
+        """
         return self.set_resource('server')
 
 
     def get_all_plugins(self):
+        """
+        Gets all plugins in the TeamCity server pointed to by this instance of the Client.
+
+        :return: an instance of the Client with `resource = <url>/server/plugins`.
+        """
         return self.set_resource('server/plugins')
 
 
     def get_all_builds(self, start=0, count=100):
+        """
+        Gets all builds in the TeamCity server pointed to by this instance of the Client.
+        This can be very large since it is historic data. Therefore the count can be limited.
+
+        :param start: what build number to start from
+        :param count: how many builds to return
+        :return: an instance of the Client with `resource = <url>/builds/?start=<start>&count=<count>`.
+        """
         self.set_start(start)
         self.set_count(count)
         return self.set_resource('builds/')
 
-
-    # btId = bt[0-9]+
     def get_all_builds_by_build_type_id(self, btId, start=0, count=100):
+        """
+        Gets all builds of a build type build type id `btId`.
+        This can be very large since it is historic data. Therefore the count can be limited.
+
+        :param btId: the build type to get builds from, in the format bt[0-9]+
+        :param start: what build number to start from
+        :param count: how many builds to return
+        :return: an instance of the Client with `resource = <url>/buildTypes/id:<btId>/builds/?start=<start>&count=<count>`.
+        """
         self.set_count(count)
         self.set_start(start)
         return self.set_resource('buildTypes/id:%s/builds/' % (btId))
 
-
-    # bId = [0-9]+
     def get_build_by_build_id(self, bId):
+        """
+        Gets a build with build ID `bId`.
+
+        :param bId: the build to get, in the format [0-9]+
+        :return: an instance of the Client with `resource = <url>/builds/id:<bId>`.
+        """
         return self.set_resource('builds/id:%s' % bId)
 
-
     def get_all_changes(self):
+        """
+        Gets all changes made in the TeamCity server pointed to by this instance of the Client.
+
+        :return: an instance of the Client with `resource = <url>/changes`.
+        """
         return self.set_resource('changes')
 
-
     def get_change_by_change_id(self, cId):
+        """
+        Gets a particular change with change ID `cId`.
+
+        :param cId: the change to get, in the format [0-9]+
+        :return: an instance of the Client with `resource = <url>/changes/id:<cId>`.
+        """
         return self.set_resource('changes/id:%s' % cId)
 
 
-    # bId = [0-9]+
     def get_changes_by_build_id(self, bId):
+        """
+        Gets changes in a build for a build ID `bId`.
+
+        :param bId: the build to get changes of in the format [0-9]+
+        :return: an instance of the Client with `resource = <url>/changes/build:id:<bId>`.
+        """
         self.parameters['build'] = 'id:%s' % (bId)
         return self.set_resource('changes')
 
-
     def get_all_build_types(self):
+        """
+        Gets all build types in the TeamCity server pointed to by this instance of the Client.
+
+        :return: an instance of the Client with `resource = <url>/buildTypes`.
+        """
         return self.set_resource('buildTypes')
 
-
-    # btId = bt[0-9]+
     def get_build_type(self, btId):
+        """
+        Gets details for a build type with id `btId`.
+
+        :param btId: the build type to get, in format bt[0-9]+
+        :return: an instance of the Client with `resource = <url>/buildTypes/id:<btId>`
+        """
         return self.set_resource('buildTypes/id:%s' % btId)
 
-
     def get_all_projects(self):
+        """
+        Gets all projects in the TeamCity server pointed to by this instance of the Client.
+
+        :return: an instance of the Client with `resource = <url>/projects`
+        """
         return self.set_resource('projects')
 
-
-    # pid = project[0-9]+
     def get_project_by_project_id(self, pId):
+        """
+        Gets details for a project with ID `pId`.
+
+        :param pId: the project ID to get, in format project[0-9]+
+        :return: an instance of the Client with `resource = <url>/projects/id:<pId>`
+        """
         return self.set_resource('projects/id:%s' % pId)
 
-
     def get_agents(self):
+        """
+        Gets all projects in the TeamCity server pointed to by this instance of the Client.
+
+        :return: an instance of the Client with `resource = <url>/projects`
+        """
         return self.set_resource('agents')
 
 
-    # aId = [0-9]+
     def get_agent_by_agent_id(self, aId):
+        """
+        Gets details for an agent with ID `aId`.
+
+        :param aId: the agent ID to get, in format [0-9]+
+        :return: an instance of the Client with `resource = <url>/agents/id:<aId>`
+        """
         return self.set_resource('agents/id:%d' % aId)
 
-
     def get_build_statistics_by_build_id(self, bId):
+        """
+        Gets statistics for a build with ID `bId`.
+        Statistics include `BuildDuration`, `FailedTestCount`, `TimeSpentInQueue`, and more.
+
+        :param bId: the build ID to get, in format [0-9]+
+        :return: an instance of the Client with `resource = <url>/builds/id:<bId>/statistics`
+        """
         return self.set_resource('builds/id:%s/statistics' % bId)
 
-
     def get_build_tags_by_build_id(self, bId):
+        """
+        Gets tags for a build with ID `bId`.
+
+        :param bId: the build ID to get, in format [0-9]+
+        :return: an instance of the Client with `resource = <url>/builds/id:<bId>/tags`
+        """
         return self.set_resource('builds/id:%s/tags' % bId)
 
-
     def get_all_vcs_roots(self):
+        """
+        Gets all VCS roots in the TeamCity server pointed to by this instance of the Client.
+
+        :return: an instance of the Client with `resource = <url>/vcs-roots`
+        """
         return self.set_resource('vcs-roots')
 
-
     def get_vcs_root_by_vcs_root_id(self, vrId):
+        """
+        Gets a VCS root with the specified ID `vrId`.
+
+        :param vrId: the VCS root to get
+        :return: an instance of the Client with `resource = <url>/vcs-roots/id:<vrId>`
+        """
         return self.set_resource('vcs-roots/id:%s' % vrId)
 
-
     def get_all_users(self):
+        """
+        Gets all users in the TeamCity server pointed to by this instance of the Client.
+
+        :return: an instance of the Client with `resource = <url>/users`
+        """
         return self.set_resource('users')
