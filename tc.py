@@ -287,9 +287,9 @@ class TeamCityRESTApiClient:
 
     def get_agents(self):
         """
-        Gets all projects in the TeamCity server pointed to by this instance of the Client.
+        Gets all agents in the TeamCity server pointed to by this instance of the Client.
 
-        :return: an instance of the Client with `resource = <url>/projects`
+        :return: an instance of the Client with `resource = <url>/agents`
         """
         return self.set_resource('agents')
 
