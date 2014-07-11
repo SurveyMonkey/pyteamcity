@@ -26,7 +26,6 @@ class TeamCityRESTApiClient:
         self.parameters['count'] = count
         return self
 
-
     # running:<true/false/any> - limit the builds by running flag.
     def set_running(self, running):
         self.locators['running'] = running
@@ -346,3 +345,12 @@ class TeamCityRESTApiClient:
         :return: an instance of the Client with `resource = <url>/users`
         """
         return self.set_resource('users')
+
+    def get_user_by_username(self, username):
+        """
+        Gets user details for a given username.
+
+        :param username: the username to get details for.
+        :return: an instance of the Client with `resource = <url>/users/username:<username>`
+        """
+        return self.set_resource('users/username:%s' % username)
