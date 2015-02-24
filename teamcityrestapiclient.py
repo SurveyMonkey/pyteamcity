@@ -133,13 +133,13 @@ class TeamCityRESTApiClient:
         if self.locators:
             locators = 'locator=' + ','.join([
                 "%s:%s" % (k, v)
-                for k, v in self.locators.iteritems()
+                for k, v in self.locators.items()
             ])
         else:
             locators = ''
         get_args = '&'.join([locators] + [
             '%s=%s' % (k, v)
-            for k, v in self.parameters.iteritems()
+            for k, v in self.parameters.items()
         ])
         if get_args:
             full_resource_url = full_resource_url + '?' + get_args
