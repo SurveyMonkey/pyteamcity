@@ -14,12 +14,29 @@ There you can add the folder to the current selected interpreter, which will mak
 
 ## Examples
 
-### Get all projects in server
+### Connect to server
 
-```language-python
+```python
 # This initialises the Client with the settings passed. <port> has to be an integer.
 client = TeamCityRESTApiClient('account', 'password', 'server', <port>)
+```
 
+or specify no parameters and it will read settings from environment
+variables:
+
+- `TEAMCITY_USER`
+- `TEAMCITY_PASSWORD`
+- `TEAMCITY_HOST`
+- `TEAMCITY_PORT` (Defaults to 80 if not set)
+
+```python
+# Initialises with environment variables: TEAMCITY_{USER,PASSWORD,HOST,PORT}
+client = TeamCityRESTApiClient()
+```
+
+### Get all projects in server
+
+```python
 # Specify the resource type we are going to get, in this case <projects>
 client.get_all_projects()
 

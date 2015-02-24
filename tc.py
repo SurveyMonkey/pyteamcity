@@ -3,15 +3,20 @@ RESTful api definition: http://${TeamCity}/guestAuth/app/rest/application.wadl
 """
 
 import json
+import os
 import urllib2
 import base64
 from datetime import datetime, timedelta
 
 
 class TeamCityRESTApiClient:
-    def __init__(self, username, password, server, port):
-        self.TC_REST_URL = "http://%s:%d/httpAuth/app/rest/" % (server, port)
-        self.userpass = '%s:%s' % (username, password)
+    def __init__(self, username=None, password=None, server=None, port=None):
+        self.username = username or os.getenv('TEAMCITY_USER')
+        self.password = password or os.getenv('TEAMCITY_PASSWORD')
+        self.userpass = '%s:%s' % (self.username, self.password)
+        self.host = server or os.getenv('TEAMCITY_HOST')
+        self.port = port or int(os.getenv('TEAMCITY_PORT', 0)) or 80
+        self.TC_REST_URL = "http://%s:%d/httpAuth/app/rest/" % (self.host, self.port)
         self.locators = {}
         self.parameters = {}
 
