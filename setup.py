@@ -14,7 +14,7 @@ setup(
     author_email='yotamoron@yahoo.com',
     py_modules=['teamcityrestapiclient'],
     zip_safe=False,
-    install_requires=[],
+    install_requires=['requests'],
     license='MIT',
     classifiers=[
         'Programming Language :: Python :: 2',
