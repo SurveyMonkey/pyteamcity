@@ -2,349 +2,232 @@
 RESTful api definition: http://${TeamCity}/guestAuth/app/rest/application.wadl
 """
 
+import os
+import re
+
 import requests
-from datetime import datetime, timedelta
+
+
+def _build_url(*args, **kwargs):
+    """Builds a new API url from scratch."""
+    parts = [kwargs.get('base_url')]
+    parts.extend(args)
+    parts = [str(p) for p in parts]
+    return '/'.join(parts)
+
+
+def GET(url_pattern):
+    def wrapped_func(f):
+        def get_url(*args, **kwargs):
+            groups = re.findall('{(\w+)}', url_pattern)
+            for arg, group in zip(args, groups):
+                kwargs[group] = arg
+            return _build_url(url_pattern.format(*args, **kwargs), **kwargs)
+
+        def inner_func(self, *args, **kwargs):
+            kwargs['base_url'] = self.base_url
+            url = get_url(*args, **kwargs)
+            request = self._get_request('GET', url)
+            return_type = kwargs.get('return_type', 'data')
+            if return_type == 'url':
+                return url
+            if return_type == 'request':
+                return request
+            response = self._get(url)
+            # import pdb; pdb.set_trace()
+            return response.json()
+        return inner_func
+    return wrapped_func
 
 
 class TeamCityRESTApiClient:
-    def __init__(self, username, password, server, port):
-        self.TC_REST_URL = "http://%s:%d/httpAuth/app/rest/" % (server, port)
-        self.username = username
-        self.password = password
+    def __init__(self, username=None, password=None, server=None, port=None, session=None):
+        self.username = username or os.getenv('TEAMCITY_USER')
+        self.password = password or os.getenv('TEAMCITY_PASSWORD')
+        self.host = server or os.getenv('TEAMCITY_HOST')
+        self.port = port or int(os.getenv('TEAMCITY_PORT', 0)) or 80
+        self.base_url = "http://%s:%d/httpAuth/app/rest" % (self.host, self.port)
         self.locators = {}
         self.parameters = {}
+        self.session = session or requests.Session()
 
+    def _build_url(self, *args, **kwargs):
+        """Builds a new API url from scratch."""
+        parts = [kwargs.get('base_url') or self.base_url]
+        parts.extend(args)
+        parts = [str(p) for p in parts]
+        return '/'.join(parts)
 
-    # count:<number> - serve only the specified number of builds
-    def set_count(self, count):
-        """
-
-        :param count:
-        :return:
-        """
-        self.parameters['count'] = count
-        return self
-
-    # running:<true/false/any> - limit the builds by running flag.
-    def set_running(self, running):
-        self.locators['running'] = running
-        return self
-
-
-    # buildType:(<buildTypeLocator>) - only the builds of the specified build configuration
-    def set_build_type(self, bt):
-        self.locators['buildType'] = bt
-        return self
-
-
-    # tags:<tags> - ","(comma) -delimited list of build tags (only builds containing all the specified tags are returned)
-    def set_tags(self, tags):
-        self.locators['tags'] = tags
-        return self
-
-
-    # status:<SUCCESS/FAILURE/ERROR> - list the builds with the specified status only
-    def set_status(self, status):
-        self.locators['status'] = status
-        return self
-
-
-    # user:(<userLocator>) - limit the builds to only those triggered by user specified
-    def set_user(self, user):
-        self.locators['user'] = user
-        return self
-
-
-    # personal:<true/false/any> - limit the builds by personal flag.
-    def set_personal(self, personal):
-        self.locators['personal'] = personal
-        return self
-
-
-    # canceled:<true/false/any> - limit the builds by canceled flag.
-    def set_canceled(self, canceled):
-        self.locators['canceled'] = canceled
-        return self
-
-
-    # pinned:<true/false/any> - limit the builds by pinned flag.
-    def set_pinned(self, pinned):
-        self.locators['pinned'] = pinned
-        return self
-
-
-    # branch:<branch locator> - since TeamCity 7.1 limit the builds by branch. <branch locator> can be branch name (displayed in UI, or "(name:<name>,default:<true/false/any>,unspecified:<true/false/any>,branched:<true/false/any>)". If not specified, only builds from default branch are returned.
-    def set_branch(self, branch):
-        self.locators['branch'] = branch
-        return self
-
-
-    # agentName:<name> - agent name to return only builds ran on the agent with name specified
-    def set_agent_name(self, agent_name):
-        self.locators['agentName'] = agent_name
-        return self
-
-
-    # sinceBuild:(<buildLocator>) - limit the list of builds only to those after the one specified
-    def set_since_build(self, since_build):
-        self.locators['sinceBuild'] = since_build
-        return self
-
-
-    # sinceDate:<date> - limit the list of builds only to those started after the date specified. The date should in the same format as dates returned by REST API.
-    def set_since_date(self, minutes):
-        minutes_delta = timedelta(minutes=minutes)
-        minutes_ago = datetime.now() - minutes_delta
-
-        # Hardcoding NY time zone here... Assumes machines is on the same timezone
-        self.locators['sinceDate'] = minutes_ago.strftime('%Y%m%dT%H%M%S') + '-0500'
-        return self
-
-
-    # start:<number> - list the builds from the list starting from the position specified (zero-based)
-    def set_start(self, start):
-        self.parameters['start'] = start
-        return self
-
-
-    # lookupLimit:<number> - since TeamCity 7.0 limit processing to the latest N builds only. If none of the latest N builds match other specified criteria of the build locator, 404 response is returned.
-    def set_lookup_limit(self, lookup_limit):
-        self.locators['lookupLimit'] = lookup_limit
-        return self
-
-
-    def set_tc_server(self, url, port):
-        self.TC_REST_URL = "http://%s:%s/httpAuth/app/rest/" % (url, port)
-        return self
-
-
-    def set_resource(self, resource):
-        self.resource = self.TC_REST_URL + resource
-        return self
-
-
-    def compose_resource_path(self):
-        """
-        Creates the URL by appending the resource, locators, and arguments in the appropriate places.
-
-        :return: the well-built URL to make the request with.
-        """
-        full_resource_url = self.resource
-        if self.locators:
-            locators = 'locator=' + ','.join([
-                "%s:%s" % (k, v)
-                for k, v in self.locators.items()
-            ])
-        else:
-            locators = ''
-        get_args = '&'.join([locators] + [
-            '%s=%s' % (k, v)
-            for k, v in self.parameters.items()
-        ])
-        if get_args:
-            full_resource_url = full_resource_url + '?' + get_args
-        return full_resource_url
-
-    def get_from_server(self):
-        """
-        Makes a request to the TeamCity server pointed to by this instance of the Client.
-        Uses httpAuth and accepts a JSON return.
-
-        Then it creates a Python dictionary by loading in the JSON.
-
-        :return: the Python dictionary which represents the JSON response.
-        """
-        full_resource_url = self.compose_resource_path()
-        response = requests.get(
-            full_resource_url,
+    def _get_request(self, verb, url, **kwargs):
+        return requests.Request(
+            verb,
+            url,
             auth=(self.username, self.password),
-            headers={'Accept': 'application/json'})
-        return response.json()
+            headers={'Accept': 'application/json'}).prepare()
 
+    def _get(self, url, **kwargs):
+        request = self._get_request('GET', url, **kwargs)
+        return self.session.send(request)
 
+    @GET('server')
     def get_server_info(self):
         """
-        Gets server info of the TeamCity server pointed to by this instance of the Client.
-
-        :return: an instance of the Client with `resource = <url>/server`.
+        Gets server info of the TeamCity server pointed to by this instance of
+        the Client.
         """
-        return self.set_resource('server')
 
-
+    @GET('server/plugins')
     def get_all_plugins(self):
         """
-        Gets all plugins in the TeamCity server pointed to by this instance of the Client.
-
-        :return: an instance of the Client with `resource = <url>/server/plugins`.
+        Gets all plugins in the TeamCity server pointed to by this instance of
+        the Client.
         """
-        return self.set_resource('server/plugins')
 
-
+    @GET('builds/?start={start}&count={count}')
     def get_all_builds(self, start=0, count=100):
         """
-        Gets all builds in the TeamCity server pointed to by this instance of the Client.
-        This can be very large since it is historic data. Therefore the count can be limited.
+        Gets all builds in the TeamCity server pointed to by this instance of
+        the Client.
+        This can be very large since it is historic data. Therefore the count
+        can be limited.
 
         :param start: what build number to start from
         :param count: how many builds to return
-        :return: an instance of the Client with `resource = <url>/builds/?start=<start>&count=<count>`.
         """
-        self.set_start(start)
-        self.set_count(count)
-        return self.set_resource('builds/')
 
-    def get_all_builds_by_build_type_id(self, btId, start=0, count=100):
+    @GET('buildTypes/id:{build_type_id}/builds/?start={start}&count={count}')
+    def get_all_builds_by_build_type_id(self, build_type_id, start=0, count=100):
         """
         Gets all builds of a build type build type id `btId`.
-        This can be very large since it is historic data. Therefore the count can be limited.
+        This can be very large since it is historic data. Therefore the count
+        can be limited.
 
-        :param btId: the build type to get builds from, in the format bt[0-9]+
+        :param build_type_id: the build type to get builds from, in the format
+        bt[0-9]+
         :param start: what build number to start from
         :param count: how many builds to return
-        :return: an instance of the Client with `resource = <url>/buildTypes/id:<btId>/builds/?start=<start>&count=<count>`.
         """
-        self.set_count(count)
-        self.set_start(start)
-        return self.set_resource('buildTypes/id:%s/builds/' % (btId))
 
-    def get_build_by_build_id(self, bId):
+    @GET('builds/id:{build_id}')
+    def get_build_by_build_id(self, build_id):
         """
         Gets a build with build ID `bId`.
 
-        :param bId: the build to get, in the format [0-9]+
-        :return: an instance of the Client with `resource = <url>/builds/id:<bId>`.
+        :param build_id: the build to get, in the format [0-9]+
         """
-        return self.set_resource('builds/id:%s' % bId)
 
+    @GET('changes')
     def get_all_changes(self):
         """
-        Gets all changes made in the TeamCity server pointed to by this instance of the Client.
-
-        :return: an instance of the Client with `resource = <url>/changes`.
+        Gets all changes made in the TeamCity server pointed to by this
+        instance of the Client.
         """
-        return self.set_resource('changes')
 
-    def get_change_by_change_id(self, cId):
+    @GET('changes/id:{change_id}')
+    def get_change_by_change_id(self, change_id):
         """
         Gets a particular change with change ID `cId`.
 
-        :param cId: the change to get, in the format [0-9]+
-        :return: an instance of the Client with `resource = <url>/changes/id:<cId>`.
+        :param change_id: the change to get, in the format [0-9]+
         """
-        return self.set_resource('changes/id:%s' % cId)
 
-
-    def get_changes_by_build_id(self, bId):
+    @GET('changes/build:id:{build_id}')
+    def get_changes_by_build_id(self, build_id):
         """
-        Gets changes in a build for a build ID `bId`.
+        Gets changes in a build for a build ID `build_id`.
 
-        :param bId: the build to get changes of in the format [0-9]+
-        :return: an instance of the Client with `resource = <url>/changes/build:id:<bId>`.
+        :param build_id: the build to get changes of in the format [0-9]+
         """
-        self.parameters['build'] = 'id:%s' % (bId)
-        return self.set_resource('changes')
 
+    @GET('buildTypes')
     def get_all_build_types(self):
         """
-        Gets all build types in the TeamCity server pointed to by this instance of the Client.
-
-        :return: an instance of the Client with `resource = <url>/buildTypes`.
+        Gets all build types in the TeamCity server pointed to by this instance
+        of the Client.
         """
-        return self.set_resource('buildTypes')
 
-    def get_build_type(self, btId):
+    @GET('buildTypes/id:{build_type_id}')
+    def get_build_type(self, build_type_id):
         """
-        Gets details for a build type with id `btId`.
+        Gets details for a build type with id `build_type_id`.
 
-        :param btId: the build type to get, in format bt[0-9]+
-        :return: an instance of the Client with `resource = <url>/buildTypes/id:<btId>`
+        :param build_type_id: the build type to get, in format bt[0-9]+
         """
-        return self.set_resource('buildTypes/id:%s' % btId)
 
+    @GET('projects')
     def get_all_projects(self):
         """
-        Gets all projects in the TeamCity server pointed to by this instance of the Client.
-
-        :return: an instance of the Client with `resource = <url>/projects`
+        Gets all projects in the TeamCity server pointed to by this instance of
+        the Client.
         """
-        return self.set_resource('projects')
 
-    def get_project_by_project_id(self, pId):
+    @GET('projects/id:{project_id}')
+    def get_project_by_project_id(self, project_id):
         """
-        Gets details for a project with ID `pId`.
+        Gets details for a project with ID `project_id`.
 
-        :param pId: the project ID to get, in format project[0-9]+
-        :return: an instance of the Client with `resource = <url>/projects/id:<pId>`
+        :param project_id: the project ID to get, in format project[0-9]+
         """
-        return self.set_resource('projects/id:%s' % pId)
 
+    @GET('agents')
     def get_agents(self):
         """
-        Gets all agents in the TeamCity server pointed to by this instance of the Client.
-
-        :return: an instance of the Client with `resource = <url>/agents`
+        Gets all agents in the TeamCity server pointed to by this instance of
+        the Client.
         """
-        return self.set_resource('agents')
 
-
-    def get_agent_by_agent_id(self, aId):
+    @GET('agents/id:{agent_id}')
+    def get_agent_by_agent_id(self, agent_id):
         """
-        Gets details for an agent with ID `aId`.
+        Gets details for an agent with ID `agent_id`.
 
-        :param aId: the agent ID to get, in format [0-9]+
-        :return: an instance of the Client with `resource = <url>/agents/id:<aId>`
+        :param agent_id: the agent ID to get, in format [0-9]+
         """
-        return self.set_resource('agents/id:%d' % aId)
 
-    def get_build_statistics_by_build_id(self, bId):
+    @GET('builds/id:{build_id}/statistics')
+    def get_build_statistics_by_build_id(self, build_id):
         """
-        Gets statistics for a build with ID `bId`.
-        Statistics include `BuildDuration`, `FailedTestCount`, `TimeSpentInQueue`, and more.
+        Gets statistics for a build with ID `build_id`.
+        Statistics include `BuildDuration`, `FailedTestCount`,
+        `TimeSpentInQueue`, and more.
 
-        :param bId: the build ID to get, in format [0-9]+
-        :return: an instance of the Client with `resource = <url>/builds/id:<bId>/statistics`
+        :param build_id: the build ID to get, in format [0-9]+
         """
-        return self.set_resource('builds/id:%s/statistics' % bId)
 
-    def get_build_tags_by_build_id(self, bId):
+    @GET('builds/id:{build_id}/tags')
+    def get_build_tags_by_build_id(self, build_id):
         """
-        Gets tags for a build with ID `bId`.
+        Gets tags for a build with ID `build_id`.
 
-        :param bId: the build ID to get, in format [0-9]+
-        :return: an instance of the Client with `resource = <url>/builds/id:<bId>/tags`
+        :param build_id: the build ID to get, in format [0-9]+
         """
-        return self.set_resource('builds/id:%s/tags' % bId)
 
+    @GET('vcs-roots')
     def get_all_vcs_roots(self):
         """
-        Gets all VCS roots in the TeamCity server pointed to by this instance of the Client.
-
-        :return: an instance of the Client with `resource = <url>/vcs-roots`
+        Gets all VCS roots in the TeamCity server pointed to by this instance
+        of the Client.
         """
-        return self.set_resource('vcs-roots')
 
-    def get_vcs_root_by_vcs_root_id(self, vrId):
+    @GET('vcs-roots/id:{vcs_root_id}')
+    def get_vcs_root_by_vcs_root_id(self, vcs_root_id):
         """
-        Gets a VCS root with the specified ID `vrId`.
+        Gets a VCS root with the specified ID `vcs_root_id`.
 
-        :param vrId: the VCS root to get
-        :return: an instance of the Client with `resource = <url>/vcs-roots/id:<vrId>`
+        :param vcs_root_id: the VCS root to get
         """
-        return self.set_resource('vcs-roots/id:%s' % vrId)
 
+    @GET('users')
     def get_all_users(self):
         """
-        Gets all users in the TeamCity server pointed to by this instance of the Client.
-
-        :return: an instance of the Client with `resource = <url>/users`
+        Gets all users in the TeamCity server pointed to by this instance of
+        the Client.
         """
-        return self.set_resource('users')
 
+    @GET('users/username:{username}')
     def get_user_by_username(self, username):
         """
         Gets user details for a given username.
 
         :param username: the username to get details for.
-        :return: an instance of the Client with `resource = <url>/users/username:<username>`
         """
-        return self.set_resource('users/username:%s' % username)
