@@ -1,5 +1,3 @@
-import requests
-
 from pyteamcity import TeamCity
 
 user = 'TEAMCITY_USER'
@@ -16,7 +14,6 @@ def test_get_all_users():
     assert url == expected_url
 
     req = tc.get_all_users(return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -28,7 +25,6 @@ def test_get_user_by_username():
     assert url == expected_url
 
     req = tc.get_user_by_username('codyw', return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -39,7 +35,6 @@ def test_get_all_vcs_roots():
     assert url == expected_url
 
     req = tc.get_all_vcs_roots(return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -50,7 +45,6 @@ def test_get_vcs_root_by_vcs_root_id():
     assert url == expected_url
 
     req = tc.get_vcs_root_by_vcs_root_id(41, return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -61,7 +55,6 @@ def test_get_agents():
     assert url == expected_url
 
     req = tc.get_agents(return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -72,7 +65,6 @@ def test_get_agent_by_agent_id():
     assert url == expected_url
 
     req = tc.get_agent_by_agent_id(41, return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -83,7 +75,6 @@ def test_get_all_projects():
     assert url == expected_url
 
     req = tc.get_all_projects(return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -95,7 +86,6 @@ def test_get_project_by_project_id_arg():
     assert url == expected_url
 
     req = tc.get_project_by_project_id('foo_project', return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -109,7 +99,6 @@ def test_get_project_by_project_id_kwarg():
 
     req = tc.get_project_by_project_id(
         project_id='foo_project', return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -120,7 +109,6 @@ def test_get_server_info():
     assert url == expected_url
 
     req = tc.get_server_info(return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -132,7 +120,6 @@ def test_get_all_plugins():
     assert url == expected_url
 
     req = tc.get_all_plugins(return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -144,7 +131,6 @@ def test_get_all_builds():
     assert url == expected_url
 
     req = tc.get_all_builds(start=0, count=3, return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -158,7 +144,6 @@ def test_get_all_builds_by_build_type_id():
 
     req = tc.get_all_builds_by_build_type_id(
         build_type_id='package', start=0, count=3, return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -170,7 +155,6 @@ def test_get_build_by_build_id_arg():
     assert url == expected_url
 
     req = tc.get_build_by_build_id('foo_build', return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -184,7 +168,6 @@ def test_get_build_by_build_id_kwarg():
 
     req = tc.get_build_by_build_id(
         build_id='foo_build', return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -196,7 +179,6 @@ def test_get_build_statistics_by_build_statistics_id_arg():
     assert url == expected_url
 
     req = tc.get_build_statistics_by_build_id('foo_build', return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -210,7 +192,6 @@ def test_get_build_statistics_by_build_id_kwarg():
 
     req = tc.get_build_statistics_by_build_id(
         build_id='foo_build', return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -222,7 +203,6 @@ def test_get_build_tags_by_build_tags_id_arg():
     assert url == expected_url
 
     req = tc.get_build_tags_by_build_id('foo_build', return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -236,7 +216,6 @@ def test_get_build_tags_by_build_id_kwarg():
 
     req = tc.get_build_tags_by_build_id(
         build_id='foo_build', return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -247,7 +226,6 @@ def test_get_all_changes():
     assert url == expected_url
 
     req = tc.get_all_changes(return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -259,7 +237,6 @@ def test_get_change_by_change_id_arg():
     assert url == expected_url
 
     req = tc.get_change_by_change_id(16884, return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -271,7 +248,6 @@ def test_get_change_by_change_id_kwarg():
     assert url == expected_url
 
     req = tc.get_change_by_change_id(change_id=16884, return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -283,7 +259,6 @@ def test_get_changes_by_build_id_arg():
     assert url == expected_url
 
     req = tc.get_changes_by_build_id(73450, return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -295,7 +270,6 @@ def test_get_changes_by_build_id_kwarg():
     assert url == expected_url
 
     req = tc.get_changes_by_build_id(build_id=73450, return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -306,7 +280,6 @@ def test_get_all_build_types():
     assert url == expected_url
 
     req = tc.get_all_build_types(return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -318,7 +291,6 @@ def test_get_build_type_arg():
     assert url == expected_url
 
     req = tc.get_build_type('foo_build', return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
 
@@ -332,6 +304,5 @@ def test_get_build_type_kwarg():
 
     req = tc.get_build_type(
         build_type_id='foo_build', return_type='request')
-    assert isinstance(req, requests.PreparedRequest)
     assert req.method == 'GET'
     assert req.url == expected_url
