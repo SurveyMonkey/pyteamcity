@@ -2,7 +2,10 @@
 
 ## What it does
 
-This code can be used to easily access the REST API of TeamCity and make sure any requests are well formed, easily.
+This code can be used to easily access the [REST
+API](https://confluence.jetbrains.com/display/TCD9/REST+API) of
+[TeamCity](https://www.jetbrains.com/teamcity/) and make sure any
+requests are well-formed, easily.
 
 ## Installation
 
