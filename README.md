@@ -15,6 +15,8 @@ pip install pyteamcity
 ### Connect to server
 
 ```python
+from teamcityrestapiclient import TeamCityRESTApiClient
+
 # This initialises the Client with the settings passed. <port> has to be an integer.
 client = TeamCityRESTApiClient('account', 'password', 'server', <port>)
 ```
@@ -28,6 +30,8 @@ variables:
 - `TEAMCITY_PORT` (Defaults to 80 if not set)
 
 ```python
+from teamcityrestapiclient import TeamCityRESTApiClient
+
 # Initialises with environment variables: TEAMCITY_{USER,PASSWORD,HOST,PORT}
 client = TeamCityRESTApiClient()
 ```
