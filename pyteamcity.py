@@ -40,7 +40,7 @@ def GET(url_pattern):
     return wrapped_func
 
 
-class TeamCityRESTApiClient:
+class TeamCity:
     def __init__(self, username=None, password=None, server=None, port=None, session=None):
         self.username = username or os.getenv('TEAMCITY_USER')
         self.password = password or os.getenv('TEAMCITY_PASSWORD')

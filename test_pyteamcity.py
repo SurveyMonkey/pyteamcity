@@ -1,13 +1,13 @@
 import requests
 
-from teamcityrestapiclient import TeamCityRESTApiClient
+from pyteamcity import TeamCity
 
 user = 'TEAMCITY_USER'
 password = 'TEAMCITY_PASSWORD'
 host = 'TEAMCITY_HOST'
 port = 4567
 
-tc = TeamCityRESTApiClient(user, password, host, port)
+tc = TeamCity(user, password, host, port)
 
 
 def test_get_all_users():

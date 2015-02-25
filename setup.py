@@ -5,14 +5,14 @@ this_dir = os.path.dirname(__file__)
 long_description = "\n" + open(os.path.join(this_dir, 'README.md')).read()
 
 setup(
-    name='teamcity_rest_client',
+    name='pyteamcity',
     version='0.0.0',
-    description='TeamCity Python REST api client',
+    description='Use the TeamCity REST API from Python',
     long_description=long_description,
-    url='https://github.com/yotamoron/teamcity-python-rest-client',
-    author='Yotam Oron',
-    author_email='yotamoron@yahoo.com',
-    py_modules=['teamcityrestapiclient'],
+    url='https://github.com/msabramo/pyteamcity',
+    author='Marc Abramowitz',
+    author_email='marc@marc-abramowitz.com',
+    py_modules=['pyteamcity'],
     zip_safe=False,
     install_requires=['requests'],
     license='MIT',
