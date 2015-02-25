@@ -1,9 +1,9 @@
 import json
 import os
 
-from teamcityrestapiclient import TeamCityRESTApiClient
+from pyteamcity import TeamCity
 
-tc = TeamCityRESTApiClient()
+tc = TeamCity()
 
 # data = tc.get_all_users()
 # print(json.dumps(data, indent=4))
