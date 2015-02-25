@@ -1,11 +1,8 @@
-# TeamCity Python REST Client
+# PyTeamCity
 
-## What it does
-
-This code can be used to easily access the [REST
+Python interface to the [REST
 API](https://confluence.jetbrains.com/display/TCD9/REST+API) of
-[TeamCity](https://www.jetbrains.com/teamcity/) and make sure any
-requests are well-formed, easily.
+[TeamCity](https://www.jetbrains.com/teamcity/)
 
 ## Installation
 
