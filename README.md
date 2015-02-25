@@ -15,10 +15,10 @@ pip install pyteamcity
 ### Connect to server
 
 ```python
-from teamcityrestapiclient import TeamCityRESTApiClient
+from pyteamcity import TeamCity
 
 # This initialises the Client with the settings passed. <port> has to be an integer.
-tc = TeamCityRESTApiClient('account', 'password', 'server', <port>)
+tc = TeamCity('account', 'password', 'server', <port>)
 ```
 
 or specify no parameters and it will read settings from environment
@@ -30,10 +30,10 @@ variables:
 - `TEAMCITY_PORT` (Defaults to 80 if not set)
 
 ```python
-from teamcityrestapiclient import TeamCityRESTApiClient
+from pyteamcity import TeamCity
 
 # Initialises with environment variables: TEAMCITY_{USER,PASSWORD,HOST,PORT}
-tc = TeamCityRESTApiClient()
+tc = TeamCity()
 ```
 
 ### Getting data
@@ -58,4 +58,4 @@ tc.get_all_plugins()
 ```
 
 You can also look at [sample.py](sample.py) or
-[test_stuff.py](test_stuff.py)
+[test_pyteamcity.py](test_pyteamcity.py)
