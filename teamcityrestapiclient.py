@@ -72,20 +72,24 @@ class TeamCityRESTApiClient:
     @GET('server')
     def get_server_info(self):
         """
-        Gets server info of the TeamCity server pointed to by this instance of the Client.
+        Gets server info of the TeamCity server pointed to by this instance of
+        the Client.
         """
 
     @GET('server/plugins')
     def get_all_plugins(self):
         """
-        Gets all plugins in the TeamCity server pointed to by this instance of the Client.
+        Gets all plugins in the TeamCity server pointed to by this instance of
+        the Client.
         """
 
     @GET('builds/?start={start}&count={count}')
     def get_all_builds(self, start=0, count=100):
         """
-        Gets all builds in the TeamCity server pointed to by this instance of the Client.
-        This can be very large since it is historic data. Therefore the count can be limited.
+        Gets all builds in the TeamCity server pointed to by this instance of
+        the Client.
+        This can be very large since it is historic data. Therefore the count
+        can be limited.
 
         :param start: what build number to start from
         :param count: how many builds to return
@@ -95,9 +99,11 @@ class TeamCityRESTApiClient:
     def get_all_builds_by_build_type_id(self, build_type_id, start=0, count=100):
         """
         Gets all builds of a build type build type id `btId`.
-        This can be very large since it is historic data. Therefore the count can be limited.
+        This can be very large since it is historic data. Therefore the count
+        can be limited.
 
-        :param build_type_id: the build type to get builds from, in the format bt[0-9]+
+        :param build_type_id: the build type to get builds from, in the format
+        bt[0-9]+
         :param start: what build number to start from
         :param count: how many builds to return
         """
@@ -113,7 +119,8 @@ class TeamCityRESTApiClient:
     @GET('changes')
     def get_all_changes(self):
         """
-        Gets all changes made in the TeamCity server pointed to by this instance of the Client.
+        Gets all changes made in the TeamCity server pointed to by this
+        instance of the Client.
         """
 
     @GET('changes/id:{change_id}')
@@ -135,7 +142,8 @@ class TeamCityRESTApiClient:
     @GET('buildTypes')
     def get_all_build_types(self):
         """
-        Gets all build types in the TeamCity server pointed to by this instance of the Client.
+        Gets all build types in the TeamCity server pointed to by this instance
+        of the Client.
         """
 
     @GET('buildTypes/id:{build_type_id}')
@@ -149,7 +157,8 @@ class TeamCityRESTApiClient:
     @GET('projects')
     def get_all_projects(self):
         """
-        Gets all projects in the TeamCity server pointed to by this instance of the Client.
+        Gets all projects in the TeamCity server pointed to by this instance of
+        the Client.
         """
 
     @GET('projects/id:{project_id}')
@@ -163,7 +172,8 @@ class TeamCityRESTApiClient:
     @GET('agents')
     def get_agents(self):
         """
-        Gets all agents in the TeamCity server pointed to by this instance of the Client.
+        Gets all agents in the TeamCity server pointed to by this instance of
+        the Client.
         """
 
     @GET('agents/id:{agent_id}')
@@ -178,7 +188,8 @@ class TeamCityRESTApiClient:
     def get_build_statistics_by_build_id(self, build_id):
         """
         Gets statistics for a build with ID `build_id`.
-        Statistics include `BuildDuration`, `FailedTestCount`, `TimeSpentInQueue`, and more.
+        Statistics include `BuildDuration`, `FailedTestCount`,
+        `TimeSpentInQueue`, and more.
 
         :param build_id: the build ID to get, in format [0-9]+
         """
@@ -194,7 +205,8 @@ class TeamCityRESTApiClient:
     @GET('vcs-roots')
     def get_all_vcs_roots(self):
         """
-        Gets all VCS roots in the TeamCity server pointed to by this instance of the Client.
+        Gets all VCS roots in the TeamCity server pointed to by this instance
+        of the Client.
         """
 
     @GET('vcs-roots/id:{vcs_root_id}')
@@ -208,7 +220,8 @@ class TeamCityRESTApiClient:
     @GET('users')
     def get_all_users(self):
         """
-        Gets all users in the TeamCity server pointed to by this instance of the Client.
+        Gets all users in the TeamCity server pointed to by this instance of
+        the Client.
         """
 
     @GET('users/username:{username}')
