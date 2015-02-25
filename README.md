@@ -18,7 +18,7 @@ pip install pyteamcity
 from teamcityrestapiclient import TeamCityRESTApiClient
 
 # This initialises the Client with the settings passed. <port> has to be an integer.
-client = TeamCityRESTApiClient('account', 'password', 'server', <port>)
+tc = TeamCityRESTApiClient('account', 'password', 'server', <port>)
 ```
 
 or specify no parameters and it will read settings from environment
@@ -33,40 +33,13 @@ variables:
 from teamcityrestapiclient import TeamCityRESTApiClient
 
 # Initialises with environment variables: TEAMCITY_{USER,PASSWORD,HOST,PORT}
-client = TeamCityRESTApiClient()
+tc = TeamCityRESTApiClient()
 ```
 
 ### Get all projects in server
 
 ```python
-# Specify the resource type we are going to get, in this case <projects>
-client.get_all_projects()
-
-# Make the cURL request and get data back as a dictionary.
-client.get_from_server()
-```
-
-### Get all builds from a build type
-
-Getting all builds from anywhere can potentially give you a very large response back, which is why we give you the ability to only make the request for a certain number of elements, and also specify where to start from.
-
-This start and count then lets you go through all the builds while never getting them all at the same time.
-
-```python
-# Specify how many returns per request and your BuildType ID
-ct = 50
-buildTypeId = "bt[0-9]+"
-
-# Get the first set of responses
-client.get_all_builds_by_build_type_id(buildTypeId, start=0, count=ct)
-response = client.get_from_server()
-
-# Loop through until the response doesn't contain a count of builds (which should be == ct)
-i = ct
-while response.keys()[0] == "count":
-	client.get_all_builds_by_build_type_id(buildTypeId, start=i, count=ct)
-	i += ct
-	response = client.get_from_server()
+tc.get_all_projects()
 ```
 
 More examples to come...
