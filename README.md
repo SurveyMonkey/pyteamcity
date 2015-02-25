@@ -6,11 +6,9 @@ API](https://confluence.jetbrains.com/display/TCD9/REST+API) of
 
 ## Installation
 
-To install simply clone the repository, and then add the folder `teamcity-python-rest-client` to your build path in your selected IDE.
-
-Using PyCharm this is done by going to __Settings__ `->` __Project Interpreter__ `->` Click the cog `->` Click on "show path for selected interpreter.".
-
-There you can add the folder to the current selected interpreter, which will make it available for your projects to use locally. In your server, you will have to place tc.py inside your Python libraries directory (in case of my CentOS installation, this is in `/usr/lib/python2.6/site-packages`).
+```
+pip install pyteamcity
+```
 
 ## Examples
 
