@@ -16,7 +16,7 @@ There you can add the folder to the current selected interpreter, which will mak
 
 ### Get all projects in server
 
-```language-python
+```python
 # This initialises the Client with the settings passed. <port> has to be an integer.
 client = TeamCityRESTApiClient('account', 'password', 'server', <port>)
 
@@ -33,7 +33,7 @@ Getting all builds from anywhere can potentially give you a very large response 
 
 This start and count then lets you go through all the builds while never getting them all at the same time.
 
-```language-python
+```python
 # Specify how many returns per request and your BuildType ID
 ct = 50
 buildTypeId = "bt[0-9]+"
