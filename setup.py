@@ -1,14 +1,24 @@
 import os
 from setuptools import setup
 
-this_dir = os.path.dirname(__file__)
-long_description = "\n" + open(os.path.join(this_dir, 'README.md')).read()
+version = '0.0.0'
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+try:
+    import pypandoc
+    README = pypandoc.convert('README.md', 'rst')
+    CHANGES = pypandoc.convert('CHANGES.md', 'rst')
+except:
+    README = read('README.md')
+    CHANGES = read('CHANGES.md')
 
 setup(
     name='pyteamcity',
-    version='0.0.0',
+    version=version,
     description='Use the TeamCity REST API from Python',
-    long_description=long_description,
+    long_description='%s\n\n%s' % (README, CHANGES),
     url='https://github.com/SurveyMonkey/pyteamcity',
     author='Marc Abramowitz',
     author_email='marca@surveymonkey.com',
