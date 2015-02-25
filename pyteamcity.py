@@ -41,12 +41,14 @@ def GET(url_pattern):
 
 
 class TeamCity:
-    def __init__(self, username=None, password=None, server=None, port=None, session=None):
+    def __init__(self, username=None, password=None, server=None, port=None,
+                 session=None):
         self.username = username or os.getenv('TEAMCITY_USER')
         self.password = password or os.getenv('TEAMCITY_PASSWORD')
         self.host = server or os.getenv('TEAMCITY_HOST')
         self.port = port or int(os.getenv('TEAMCITY_PORT', 0)) or 80
-        self.base_url = "http://%s:%d/httpAuth/app/rest" % (self.host, self.port)
+        self.base_url = "http://%s:%d/httpAuth/app/rest" % (
+            self.host, self.port)
         self.locators = {}
         self.parameters = {}
         self.session = session or requests.Session()
@@ -96,7 +98,8 @@ class TeamCity:
         """
 
     @GET('buildTypes/id:{build_type_id}/builds/?start={start}&count={count}')
-    def get_all_builds_by_build_type_id(self, build_type_id, start=0, count=100):
+    def get_all_builds_by_build_type_id(self, build_type_id,
+                                        start=0, count=100):
         """
         Gets all builds of a build type build type id `btId`.
         This can be very large since it is historic data. Therefore the count
