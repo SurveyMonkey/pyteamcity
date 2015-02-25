@@ -3,12 +3,7 @@ import os
 
 from teamcityrestapiclient import TeamCityRESTApiClient
 
-user = os.getenv('TEAMCITY_USER')
-password = os.getenv('TEAMCITY_PASSWORD')
-host = os.getenv('TEAMCITY_HOST')
-port = int(os.getenv('TEAMCITY_PORT'))
-
-tc = TeamCityRESTApiClient(user, password, host, port)
+tc = TeamCityRESTApiClient()
 
 # data = tc.get_all_users()
 # print(json.dumps(data, indent=4))
