@@ -40,7 +40,8 @@ def test_get_all_vcs_roots():
 
 
 def test_get_vcs_root_by_vcs_root_id():
-    expected_url = 'http://TEAMCITY_HOST:4567/httpAuth/app/rest/vcs-roots/id:41'
+    expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
+                    'vcs-roots/id:41')
     url = tc.get_vcs_root_by_vcs_root_id(41, return_type='url')
     assert url == expected_url
 
@@ -175,10 +176,12 @@ def test_get_build_by_build_id_kwarg():
 def test_get_build_statistics_by_build_statistics_id_arg():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest'
                     '/builds/id:foo_build/statistics')
-    url = tc.get_build_statistics_by_build_id('foo_build', return_type='url')
+    url = tc.get_build_statistics_by_build_id(
+        'foo_build', return_type='url')
     assert url == expected_url
 
-    req = tc.get_build_statistics_by_build_id('foo_build', return_type='request')
+    req = tc.get_build_statistics_by_build_id(
+        'foo_build', return_type='request')
     assert req.method == 'GET'
     assert req.url == expected_url
 

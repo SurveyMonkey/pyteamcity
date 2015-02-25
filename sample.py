@@ -1,5 +1,4 @@
 import json
-import os
 
 from pyteamcity import TeamCity
 
@@ -50,7 +49,8 @@ print(json.dumps(data, indent=4))
 # data = tc.get_build_type(build_type_id='Teamcity_TriggerFullBackup')
 # print(json.dumps(data, indent=4))
 
-# data = tc.get_all_builds_by_build_type_id(build_type_id='Teamcity_TriggerFullBackup', start=0, count=3)
+# data = tc.get_all_builds_by_build_type_id(
+#     build_type_id='Teamcity_TriggerFullBackup', start=0, count=3)
 # print(json.dumps(data, indent=4))
 
 # data = tc.get_all_builds(start=0, count=3)
@@ -71,8 +71,10 @@ print(json.dumps(data, indent=4))
 # url = tc.get_project_by_project_id.get_url('Usercontentsvc_ReleaseToMt5')
 # print(url)
 
-# url = tc.get_project_by_project_id('Usercontentsvc_ReleaseToMt5', return_type='url')
+# url = tc.get_project_by_project_id(
+#     'Usercontentsvc_ReleaseToMt5', return_type='url')
 # print(url)
 
-# url = tc.get_project_by_project_id('Usercontentsvc_ReleaseToMt5', return_type='request')
+# url = tc.get_project_by_project_id(
+#     'Usercontentsvc_ReleaseToMt5', return_type='request')
 # print(url)

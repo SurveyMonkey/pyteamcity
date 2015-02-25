@@ -3,6 +3,7 @@ from setuptools import setup
 
 version = '0.0.0'
 
+
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
