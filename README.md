@@ -57,4 +57,5 @@ tc.get_agents()
 tc.get_all_plugins()
 ```
 
-More examples to come...
+You can also look at [sample.py](sample.py) or
+[test_stuff.py](test_stuff.py)
