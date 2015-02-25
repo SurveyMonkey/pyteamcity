@@ -62,3 +62,7 @@ tc.get_all_plugins()
 
 You can also look at [sample.py](sample.py) or
 [test_pyteamcity.py](test_pyteamcity.py)
+
+## Acknowledgements
+
+This is a heavily-modified fork of https://github.com/yotamoron/teamcity-python-rest-client so many thanks are due to @yotamoron. 
