@@ -36,10 +36,25 @@ from teamcityrestapiclient import TeamCityRESTApiClient
 tc = TeamCityRESTApiClient()
 ```
 
-### Get all projects in server
+### Getting data
 
 ```python
 tc.get_all_projects()
+tc.get_project_by_project_id('MyProject')
+tc.get_all_users()
+tc.get_user_by_username('codyw')
+tc.get_all_vcs_roots()
+tc.get_all_build_types()
+tc.get_changes_by_build_id(73450)
+tc.get_build_statistics_by_build_id(73450)
+tc.get_build_tags_by_build_id(73450)
+tc.get_all_changes()
+tc.get_change_by_change_id(16884)
+tc.get_all_builds(start=0, count=3)
+tc.get_build_by_build_id(73450)
+tc.get_server_info()
+tc.get_agents()
+tc.get_all_plugins()
 ```
 
 More examples to come...
