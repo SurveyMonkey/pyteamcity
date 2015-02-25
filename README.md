@@ -1,7 +1,7 @@
 # PyTeamCity
 
-[![Build
-Status](https://travis-ci.org/SurveyMonkey/pyteamcity.svg?branch=master)](https://travis-ci.org/SurveyMonkey/pyteamcity)
+[![Latest Version](https://pypip.in/version/pyteamcity/badge.svg)](https://pypi.python.org/pypi/pyteamcity/)
+[![Build Status](https://travis-ci.org/SurveyMonkey/pyteamcity.svg?branch=master)](https://travis-ci.org/SurveyMonkey/pyteamcity)
 
 Python interface to the [REST
 API](https://confluence.jetbrains.com/display/TCD9/REST+API) of
