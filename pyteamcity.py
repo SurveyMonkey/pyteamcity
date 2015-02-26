@@ -34,8 +34,10 @@ def GET(url_pattern):
             if return_type == 'request':
                 return request
             response = self._get(url)
-            # import pdb; pdb.set_trace()
-            return response.json()
+            try:
+                return response.json()
+            except Exception as e:
+                return response.text
         return inner_func
     return wrapped_func
 
