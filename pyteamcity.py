@@ -2,6 +2,7 @@
 RESTful api definition: http://${TeamCity}/guestAuth/app/rest/application.wadl
 """
 
+import inspect
 import os
 import re
 
@@ -16,13 +17,30 @@ def _build_url(*args, **kwargs):
     return '/'.join(parts)
 
 
+def get_default_kwargs(func):
+    """Returns a sequence of tuples (kwarg_name, default_value) for func"""
+    argspec = inspect.getargspec(func)
+    if not argspec.defaults:
+        return []
+    return zip(argspec.args[-len(argspec.defaults):],
+               argspec.defaults)
+
+
 def GET(url_pattern):
     def wrapped_func(f):
         def get_url(*args, **kwargs):
+            # kwargs with default values declared by function
+            all_kwargs = dict(get_default_kwargs(f))
+
+            # kwargs for positional arguments passed by caller
             groups = re.findall('{(\w+)}', url_pattern)
-            for arg, group in zip(args, groups):
-                kwargs[group] = arg
-            return _build_url(url_pattern.format(*args, **kwargs), **kwargs)
+            all_kwargs.update(dict(zip(groups, args)))
+
+            # kwargs for keyword arguments passed by caller
+            all_kwargs.update(kwargs)
+
+            return _build_url(url_pattern.format(*args, **all_kwargs),
+                              **all_kwargs)
 
         def inner_func(self, *args, **kwargs):
             kwargs['base_url'] = self.base_url
