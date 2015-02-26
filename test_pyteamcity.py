@@ -125,37 +125,111 @@ def test_get_all_plugins():
     assert req.url == expected_url
 
 
-def test_get_all_builds():
+def test_get_builds_no_args():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
-                    'builds/?start=0&count=100')
-    url = tc.get_all_builds(return_type='url')
+                    'builds/'
+                    '?locator=branch:'
+                    '&start=0&count=100')
+    url = tc.get_builds(return_type='url')
     assert url == expected_url
 
-    req = tc.get_all_builds(return_type='request')
+    req = tc.get_builds(return_type='request')
     assert req.method == 'GET'
     assert req.url == expected_url
 
 
-def test_get_all_builds_with_start_and_count():
+def test_get_builds_with_branch():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
-                    'builds/?start=0&count=3')
-    url = tc.get_all_builds(start=0, count=3, return_type='url')
+                    'builds/'
+                    '?locator=branch:master'
+                    '&start=0&count=100')
+    url = tc.get_builds(branch='master', return_type='url')
     assert url == expected_url
 
-    req = tc.get_all_builds(start=0, count=3, return_type='request')
+    req = tc.get_builds(branch='master', return_type='request')
     assert req.method == 'GET'
     assert req.url == expected_url
 
 
-def test_get_all_builds_by_build_type_id():
+def test_get_builds_with_start_and_count():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
-                    'buildTypes/id:package/builds/?start=0&count=3')
-    url = tc.get_all_builds_by_build_type_id(
-        build_type_id='package', start=0, count=3, return_type='url')
+                    'builds/'
+                    '?locator=branch:'
+                    '&start=0&count=3')
+    url = tc.get_builds(start=0, count=3, return_type='url')
     assert url == expected_url
 
-    req = tc.get_all_builds_by_build_type_id(
-        build_type_id='package', start=0, count=3, return_type='request')
+    req = tc.get_builds(start=0, count=3, return_type='request')
+    assert req.method == 'GET'
+    assert req.url == expected_url
+
+
+def test_get_builds_with_start_and_count_and_branch():
+    expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
+                    'builds/'
+                    '?locator=branch:master'
+                    '&start=0&count=3')
+    url = tc.get_builds(branch='master', start=0, count=3,
+                        return_type='url')
+    assert url == expected_url
+
+    req = tc.get_builds(branch='master', start=0, count=3,
+                        return_type='request')
+    assert req.method == 'GET'
+    assert req.url == expected_url
+
+
+def test_get_builds_by_build_type():
+    expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
+                    'builds/'
+                    '?locator=buildType:package,branch:'
+                    '&start=0&count=100')
+    url = tc.get_builds(
+        build_type_id='package',
+        return_type='url')
+    assert url == expected_url
+
+    req = tc.get_builds(
+        build_type_id='package',
+        return_type='request')
+    assert req.method == 'GET'
+    assert req.url == expected_url
+
+
+def test_get_builds_by_build_type_and_branch_and_start_and_count():
+    expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
+                    'builds/'
+                    '?locator=buildType:package,branch:master'
+                    '&start=0&count=3')
+    url = tc.get_builds(
+        build_type_id='package', branch='master',
+        start=0, count=3,
+        return_type='url')
+    assert url == expected_url
+
+    req = tc.get_builds(
+        build_type_id='package', branch='master',
+        start=0, count=3,
+        return_type='request')
+    assert req.method == 'GET'
+    assert req.url == expected_url
+
+
+def test_get_builds_by_build_type_and_start_and_count():
+    expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
+                    'builds/'
+                    '?locator=buildType:package,branch:'
+                    '&start=0&count=3')
+    url = tc.get_builds(
+        build_type_id='package',
+        start=0, count=3,
+        return_type='url')
+    assert url == expected_url
+
+    req = tc.get_builds(
+        build_type_id='package',
+        start=0, count=3,
+        return_type='request')
     assert req.method == 'GET'
     assert req.url == expected_url
 
