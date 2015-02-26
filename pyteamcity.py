@@ -29,13 +29,18 @@ def get_default_kwargs(func):
 def GET(url_pattern):
     def wrapped_func(f):
         def get_url(*args, **kwargs):
+            # kwargs with default values declared by function
+            all_kwargs = dict(get_default_kwargs(f))
+
+            # kwargs for positional arguments passed by caller
             groups = re.findall('{(\w+)}', url_pattern)
-            for arg, group in zip(args, groups):
-                kwargs[group] = arg
-            for arg, default in get_default_kwargs(f):
-                if arg not in kwargs:
-                    kwargs[arg] = default
-            return _build_url(url_pattern.format(*args, **kwargs), **kwargs)
+            all_kwargs.update(dict(zip(groups, args)))
+
+            # kwargs for keyword arguments passed by caller
+            all_kwargs.update(kwargs)
+
+            return _build_url(url_pattern.format(*args, **all_kwargs),
+                              **all_kwargs)
 
         def inner_func(self, *args, **kwargs):
             kwargs['base_url'] = self.base_url
