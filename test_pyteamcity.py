@@ -127,6 +127,17 @@ def test_get_all_plugins():
 
 def test_get_all_builds():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
+                    'builds/?start=0&count=100')
+    url = tc.get_all_builds(return_type='url')
+    assert url == expected_url
+
+    req = tc.get_all_builds(return_type='request')
+    assert req.method == 'GET'
+    assert req.url == expected_url
+
+
+def test_get_all_builds_with_start_and_count():
+    expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
                     'builds/?start=0&count=3')
     url = tc.get_all_builds(start=0, count=3, return_type='url')
     assert url == expected_url
