@@ -105,8 +105,22 @@ class TeamCity:
         the Client.
         """
 
-    @GET('builds/?start={start}&count={count}')
-    def get_all_builds(self, start=0, count=100):
+    def get_builds(self, build_type_id='', branch='',
+                   start=0, count=100, **kwargs):
+        if build_type_id:
+            return self.get_all_builds_by_build_type_id(
+                build_type_id, branch,
+                start, count,
+                **kwargs)
+        else:
+            return self.get_all_builds(
+                branch,
+                start, count,
+                **kwargs)
+
+    @GET('builds/?locator=branch:{branch}&start={start}&count={count}')
+    def get_all_builds(self, branch='',
+                       start=0, count=100):
         """
         Gets all builds in the TeamCity server pointed to by this instance of
         the Client.
@@ -117,8 +131,10 @@ class TeamCity:
         :param count: how many builds to return
         """
 
-    @GET('buildTypes/id:{build_type_id}/builds/?start={start}&count={count}')
-    def get_all_builds_by_build_type_id(self, build_type_id,
+    @GET('builds/'
+         '?locator=buildType:{build_type_id},branch:{branch}'
+         '&start={start}&count={count}')
+    def get_all_builds_by_build_type_id(self, build_type_id, branch='',
                                         start=0, count=100):
         """
         Gets all builds of a build type build type id `btId`.
