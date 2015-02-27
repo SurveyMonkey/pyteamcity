@@ -73,13 +73,6 @@ class TeamCity:
         self.parameters = {}
         self.session = session or requests.Session()
 
-    def _build_url(self, *args, **kwargs):
-        """Builds a new API url from scratch."""
-        parts = [kwargs.get('base_url') or self.base_url]
-        parts.extend(args)
-        parts = [str(p) for p in parts]
-        return '/'.join(parts)
-
     def _get_request(self, verb, url, **kwargs):
         return requests.Request(
             verb,
