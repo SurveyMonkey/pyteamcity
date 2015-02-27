@@ -136,7 +136,7 @@ def make_response(status_code, data):
     return response
 
 
-def test_get_builds_no_args_mock_send():
+def test_get_builds_mock_send():
     with mock.patch.object(tc.session, 'send') as mock_send:
         expected_data = {
             "count": 1,
@@ -158,6 +158,15 @@ def test_get_builds_no_args_mock_send():
             ]
         }
         mock_send.return_value = make_response(200, expected_data)
+        data = tc.get_builds()
+        assert data == expected_data
+
+
+def test_get_builds_mock_send_simulate_error():
+    with mock.patch.object(tc.session, 'send') as mock_send:
+        expected_data = "Something's always wrong"
+        mock_send.return_value = make_response(500, None)
+        mock_send.return_value._content = expected_data
         data = tc.get_builds()
         assert data == expected_data
 
