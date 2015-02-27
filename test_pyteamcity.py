@@ -1,3 +1,7 @@
+import json
+import mock
+import requests
+
 from pyteamcity import TeamCity
 
 user = 'TEAMCITY_USER'
@@ -123,6 +127,39 @@ def test_get_all_plugins():
     req = tc.get_all_plugins(return_type='request')
     assert req.method == 'GET'
     assert req.url == expected_url
+
+
+def make_response(status_code, data):
+    response = requests.Response()
+    response.status_code = status_code
+    response._content = json.dumps(data).encode('utf-8')
+    return response
+
+
+def test_get_builds_no_args_mock_send():
+    with mock.patch.object(tc.session, 'send') as mock_send:
+        expected_data = {
+            "count": 1,
+            "href": "/httpAuth/app/rest/builds/"
+                    "?locator=branch:&start=0&count=100",
+            'build': [
+                {
+                    "status": "FAILURE",
+                    "defaultBranch": True,
+                    "webUrl": "http://TEAMCITY_HOST:4567/viewLog.html"
+                              "?buildId=70322&buildTypeId=Ansvc_Branches_Py34",
+                    "number": "1",
+                    "state": "finished",
+                    "href": "/httpAuth/app/rest/builds/id:70322",
+                    "branchName": "develop",
+                    "buildTypeId": "Ansvc_Branches_Py34",
+                    "id": 70322,
+                },
+            ]
+        }
+        mock_send.return_value = make_response(200, expected_data)
+        data = tc.get_builds()
+        assert data == expected_data
 
 
 def test_get_builds_no_args():
