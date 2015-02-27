@@ -166,7 +166,7 @@ def test_get_builds_mock_send_simulate_error():
     with mock.patch.object(tc.session, 'send') as mock_send:
         expected_data = "Something's always wrong"
         mock_send.return_value = make_response(500, None)
-        mock_send.return_value._content = expected_data
+        mock_send.return_value._content = expected_data.encode('utf-8')
         data = tc.get_builds()
         assert data == expected_data
 
