@@ -102,13 +102,14 @@ class TeamCity:
                    start=0, count=100, **kwargs):
         if build_type_id:
             return self.get_all_builds_by_build_type_id(
-                build_type_id, branch,
-                start, count,
+                build_type_id=build_type_id,
+                branch=branch,
+                start=start, count=count,
                 **kwargs)
         else:
             return self.get_all_builds(
-                branch,
-                start, count,
+                branch=branch,
+                start=start, count=count,
                 **kwargs)
 
     @GET('builds/?locator=branch:{branch}&start={start}&count={count}')
