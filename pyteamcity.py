@@ -127,6 +127,8 @@ class TeamCity:
             _get_locator_kwargs['branch'] = branch
         if build_type_id:
             _get_locator_kwargs['build_type'] = build_type_id
+        if status:
+            _get_locator_kwargs['status'] = status
 
         locator = self._get_locator(**_get_locator_kwargs)
 
