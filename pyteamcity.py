@@ -9,6 +9,22 @@ import re
 import requests
 
 
+class HTTPError(Exception):
+    url = None
+    status_code = None
+
+    def __init__(self, msg, url, status_code):
+        super(HTTPError, self).__init__(msg)
+        self.url = url
+        self.status_code = status_code
+
+
+def _underscore_to_camel_case(s):
+    words = s.split('_')
+    words = [words[0].lower()] + [w.title() for w in words[1:]]
+    return ''.join(words)
+
+
 def _build_url(*args, **kwargs):
     """Builds a new API url from scratch."""
     parts = [kwargs.get('base_url')]
@@ -52,6 +68,12 @@ def GET(url_pattern):
             if return_type == 'request':
                 return request
             response = self._get(url)
+            try:
+                response.raise_for_status()
+            except requests.exceptions.HTTPError:
+                raise HTTPError(response.text,
+                                url=url,
+                                status_code=response.status_code)
             try:
                 return response.json()
             except Exception as e:
@@ -98,22 +120,37 @@ class TeamCity:
         the Client.
         """
 
-    def get_builds(self, build_type_id='', branch='',
+    def get_builds(self, build_type_id='', branch='', status='',
                    start=0, count=100, **kwargs):
+        _get_locator_kwargs = {}
+        if branch:
+            _get_locator_kwargs['branch'] = branch
         if build_type_id:
-            return self.get_all_builds_by_build_type_id(
-                build_type_id, branch,
-                start, count,
+            _get_locator_kwargs['build_type'] = build_type_id
+
+        locator = self._get_locator(**_get_locator_kwargs)
+
+        if locator:
+            return self.get_all_builds_locator(
+                locator=locator,
+                start=start, count=count,
                 **kwargs)
         else:
             return self.get_all_builds(
-                branch,
-                start, count,
+                start=start, count=count,
                 **kwargs)
 
-    @GET('builds/?locator=branch:{branch}&start={start}&count={count}')
-    def get_all_builds(self, branch='',
-                       start=0, count=100):
+    def _get_locator(self, **kwargs):
+        if not kwargs:
+            return ''
+
+        # Sort kwargs.items() so that ordering is deterministic, which is very
+        # handy for automated tests
+        return ','.join('%s:%s' % (_underscore_to_camel_case(k), v)
+                        for k, v in sorted(kwargs.items()) if v)
+
+    @GET('builds/?start={start}&count={count}')
+    def get_all_builds(self, start=0, count=100):
         """
         Gets all builds in the TeamCity server pointed to by this instance of
         the Client.
@@ -124,18 +161,14 @@ class TeamCity:
         :param count: how many builds to return
         """
 
-    @GET('builds/'
-         '?locator=buildType:{build_type_id},branch:{branch}'
-         '&start={start}&count={count}')
-    def get_all_builds_by_build_type_id(self, build_type_id, branch='',
-                                        start=0, count=100):
+    @GET('builds/?locator={locator}&start={start}&count={count}')
+    def get_all_builds_locator(self, locator='', start=0, count=100):
         """
-        Gets all builds of a build type build type id `btId`.
+        Gets all builds in the TeamCity server pointed to by this instance of
+        the Client.
         This can be very large since it is historic data. Therefore the count
         can be limited.
 
-        :param build_type_id: the build type to get builds from, in the format
-        bt[0-9]+
         :param start: what build number to start from
         :param count: how many builds to return
         """
