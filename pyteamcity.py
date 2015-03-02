@@ -136,12 +136,12 @@ class TeamCity:
         locator = self._get_locator(**_get_locator_kwargs)
 
         if locator:
-            return self.get_all_builds_locator(
+            return self._get_all_builds_locator(
                 locator=locator,
                 start=start, count=count,
                 **kwargs)
         else:
-            return self.get_all_builds(
+            return self._get_all_builds(
                 start=start, count=count,
                 **kwargs)
 
@@ -155,7 +155,7 @@ class TeamCity:
                         for k, v in sorted(kwargs.items()) if v)
 
     @GET('builds/?start={start}&count={count}')
-    def get_all_builds(self, start=0, count=100):
+    def _get_all_builds(self, start=0, count=100):
         """
         Gets all builds in the TeamCity server pointed to by this instance of
         the Client.
@@ -167,7 +167,7 @@ class TeamCity:
         """
 
     @GET('builds/?locator={locator}&start={start}&count={count}')
-    def get_all_builds_locator(self, locator='', start=0, count=100):
+    def _get_all_builds_locator(self, locator='', start=0, count=100):
         """
         Gets all builds in the TeamCity server pointed to by this instance of
         the Client.
