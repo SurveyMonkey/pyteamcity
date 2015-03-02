@@ -118,7 +118,7 @@ class TeamCity:
         the Client.
         """
 
-    def get_builds(self, build_type_id='', branch='', status='',
+    def get_builds(self, build_type_id='', branch='', status='', tags=None,
                    start=0, count=100, **kwargs):
         _get_locator_kwargs = {}
         if branch:
@@ -127,6 +127,8 @@ class TeamCity:
             _get_locator_kwargs['build_type'] = build_type_id
         if status:
             _get_locator_kwargs['status'] = status
+        if tags:
+            _get_locator_kwargs['tags'] = tags
 
         locator = self._get_locator(**_get_locator_kwargs)
 
