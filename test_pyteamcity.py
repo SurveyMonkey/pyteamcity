@@ -1,8 +1,10 @@
 import json
+
 import mock
+import pytest
 import requests
 
-from pyteamcity import TeamCity
+from pyteamcity import TeamCity, HTTPError
 
 user = 'TEAMCITY_USER'
 password = 'TEAMCITY_PASSWORD'
@@ -167,15 +169,16 @@ def test_get_builds_mock_send_simulate_error():
         expected_data = "Something's always wrong"
         mock_send.return_value = make_response(500, None)
         mock_send.return_value._content = expected_data.encode('utf-8')
-        data = tc.get_builds()
-        assert data == expected_data
+        with pytest.raises(HTTPError) as excinfo:
+            tc.get_builds()
+            assert excinfo.value.status_code == 500
+            assert excinfo.value.message == expected_data
 
 
 def test_get_builds_no_args():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
                     'builds/'
-                    '?locator=branch:'
-                    '&start=0&count=100')
+                    '?start=0&count=100')
     url = tc.get_builds(return_type='url')
     assert url == expected_url
 
@@ -200,8 +203,7 @@ def test_get_builds_with_branch():
 def test_get_builds_with_start_and_count():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
                     'builds/'
-                    '?locator=branch:'
-                    '&start=0&count=3')
+                    '?start=0&count=3')
     url = tc.get_builds(start=0, count=3, return_type='url')
     assert url == expected_url
 
@@ -228,7 +230,7 @@ def test_get_builds_with_start_and_count_and_branch():
 def test_get_builds_by_build_type():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
                     'builds/'
-                    '?locator=buildType:package,branch:'
+                    '?locator=buildType:package'
                     '&start=0&count=100')
     url = tc.get_builds(
         build_type_id='package',
@@ -245,7 +247,7 @@ def test_get_builds_by_build_type():
 def test_get_builds_by_build_type_and_branch_and_start_and_count():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
                     'builds/'
-                    '?locator=buildType:package,branch:master'
+                    '?locator=branch:master,buildType:package'
                     '&start=0&count=3')
     url = tc.get_builds(
         build_type_id='package', branch='master',
@@ -264,7 +266,7 @@ def test_get_builds_by_build_type_and_branch_and_start_and_count():
 def test_get_builds_by_build_type_and_start_and_count():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
                     'builds/'
-                    '?locator=buildType:package,branch:'
+                    '?locator=buildType:package'
                     '&start=0&count=3')
     url = tc.get_builds(
         build_type_id='package',
