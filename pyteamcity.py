@@ -91,8 +91,6 @@ class TeamCity:
         self.port = port or int(os.getenv('TEAMCITY_PORT', 0)) or 80
         self.base_url = "http://%s:%d/httpAuth/app/rest" % (
             self.host, self.port)
-        self.locators = {}
-        self.parameters = {}
         self.session = session or requests.Session()
 
     def _get_request(self, verb, url, **kwargs):
