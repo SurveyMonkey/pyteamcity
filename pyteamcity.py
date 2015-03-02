@@ -119,6 +119,7 @@ class TeamCity:
         """
 
     def get_builds(self, build_type_id='', branch='', status='', tags=None,
+                   user=None,
                    start=0, count=100, **kwargs):
         _get_locator_kwargs = {}
         if branch:
@@ -129,6 +130,8 @@ class TeamCity:
             _get_locator_kwargs['status'] = status
         if tags:
             _get_locator_kwargs['tags'] = tags
+        if user:
+            _get_locator_kwargs['user'] = user
 
         locator = self._get_locator(**_get_locator_kwargs)
 
