@@ -263,6 +263,25 @@ def test_get_builds_by_build_type_and_branch_and_start_and_count():
     assert req.url == expected_url
 
 
+def test_get_builds_by_build_type_and_branch_and_status_start_and_count():
+    expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
+                    'builds/'
+                    '?locator=branch:master,buildType:package,status:failure'
+                    '&start=0&count=3')
+    url = tc.get_builds(
+        build_type_id='package', branch='master', status='failure',
+        start=0, count=3,
+        return_type='url')
+    assert url == expected_url
+
+    req = tc.get_builds(
+        build_type_id='package', branch='master', status='failure',
+        start=0, count=3,
+        return_type='request')
+    assert req.method == 'GET'
+    assert req.url == expected_url
+
+
 def test_get_builds_by_build_type_and_start_and_count():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
                     'builds/'
