@@ -76,14 +76,82 @@ def test_get_agent_by_agent_id():
     assert req.url == expected_url
 
 
-def test_get_all_projects():
+def test_get_projects():
     expected_url = 'http://TEAMCITY_HOST:4567/httpAuth/app/rest/projects'
-    url = tc.get_all_projects(return_type='url')
+    url = tc.get_projects(return_type='url')
     assert url == expected_url
 
-    req = tc.get_all_projects(return_type='request')
+    req = tc.get_projects(return_type='request')
     assert req.method == 'GET'
     assert req.url == expected_url
+
+
+def test_get_projects_parent_project_id():
+    expected_url = 'http://TEAMCITY_HOST:4567/httpAuth/app/rest/projects'
+    url = tc.get_projects(parent_project_id='foo', return_type='url')
+    assert url == expected_url
+
+    req = tc.get_projects(parent_project_id='foo', return_type='request')
+    assert req.method == 'GET'
+    assert req.url == expected_url
+
+
+def test_get_projects_mock_send():
+    with mock.patch.object(tc.session, 'send') as mock_send:
+        expected_data = {
+            'count': 2,
+            'href': '/httpAuth/app/rest/projects',
+            'project': [
+             {'description': 'Contains all other projects',
+              'href': '/httpAuth/app/rest/projects/id:_Root',
+              'id': '_Root',
+              'name': '<Root project>',
+              'webUrl': 'http://tcserver/project.html?projectId=_Root'},
+             {'href': '/httpAuth/app/rest/projects/id:Admintools',
+              'id': 'Admintools',
+              'name': 'admintools',
+              'parentProjectId': '_Root',
+              'webUrl': 'http://tcserver/project.html?projectId=Admintools'},
+            ]}
+        mock_send.return_value = make_response(200, expected_data)
+        projects = tc.get_projects()
+        assert projects == expected_data
+
+
+def test_get_projects_parent_project_id_mock_send():
+    with mock.patch.object(tc.session, 'send') as mock_send:
+        expected_data = {
+            'count': 2,
+            'href': '/httpAuth/app/rest/projects',
+            'project': [
+             {'description': 'Contains all other projects',
+              'href': '/httpAuth/app/rest/projects/id:_Root',
+              'id': '_Root',
+              'name': '<Root project>',
+              'webUrl': 'http://tcserver/project.html?projectId=_Root'},
+             {'href': '/httpAuth/app/rest/projects/id:Admintools',
+              'id': 'Admintools',
+              'name': 'admintools',
+              'parentProjectId': '_Root',
+              'webUrl': 'http://tcserver/project.html?projectId=Admintools'},
+             {'href': '/httpAuth/app/rest/projects/id:foo',
+              'id': 'foo',
+              'name': 'foo',
+              'parentProjectId': '_Root',
+              'webUrl': 'http://tcserver/project.html?projectId=foo'},
+             {'href': '/httpAuth/app/rest/projects/id:foo_child',
+              'id': 'foo_child',
+              'name': 'foo_child',
+              'parentProjectId': 'foo',
+              'webUrl': 'http://tcserver/project.html?projectId=foo_child'},
+            ]}
+        mock_send.return_value = make_response(200, expected_data)
+        projects = tc.get_projects(parent_project_id='foo')
+        assert len(projects) == 1
+        project = projects[0]
+        assert project['id'] == 'foo_child'
+        assert project['name'] == 'foo_child'
+        assert project['parentProjectId'] == 'foo'
 
 
 def test_get_project_by_project_id_arg():
