@@ -231,8 +231,11 @@ class TeamCity:
         if parent_project_id is None or return_type in ('url', 'request'):
             return all_projects_data
 
-        return [project for project in all_projects_data['project']
-                if parent_project_id == project.get('parentProjectId')]
+        projects = [project for project in all_projects_data['project']
+                    if parent_project_id == project.get('parentProjectId')]
+        ret = {'count': len(projects),
+               'project': projects}
+        return ret
 
     @GET('projects')
     def _get_all_projects(self):
