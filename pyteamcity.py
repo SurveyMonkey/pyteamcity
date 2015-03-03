@@ -224,8 +224,18 @@ class TeamCity:
         :param build_type_id: the build type to get, in format bt[0-9]+
         """
 
+    def get_projects(self, parent_project_id=None, **kwargs):
+        return_type = kwargs.get('return_type')
+        all_projects_data = self._get_all_projects(**kwargs)
+
+        if parent_project_id is None or return_type in ('url', 'request'):
+            return all_projects_data
+
+        return [project for project in all_projects_data['project']
+                if parent_project_id == project.get('parentProjectId')]
+
     @GET('projects')
-    def get_all_projects(self):
+    def _get_all_projects(self):
         """
         Gets all projects in the TeamCity server pointed to by this instance of
         the Client.
