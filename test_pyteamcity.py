@@ -146,7 +146,9 @@ def test_get_projects_parent_project_id_mock_send():
               'webUrl': 'http://tcserver/project.html?projectId=foo_child'},
             ]}
         mock_send.return_value = make_response(200, expected_data)
-        projects = tc.get_projects(parent_project_id='foo')
+        data = tc.get_projects(parent_project_id='foo')
+        assert data['count'] == 1
+        projects = data['project']
         assert len(projects) == 1
         project = projects[0]
         assert project['id'] == 'foo_child'
