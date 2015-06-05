@@ -297,9 +297,8 @@ class TeamCity:
         :param build_id: the build ID to get, in format [0-9]+
         """
 
-    @GET('builds/id:{build_id}/artifacts')
-    def get_build_artifacts_by_build_id(self, build_id):
-        #  http://teamcity:8111/httpAuth/app/rest/builds/<buildLocator>/artifacts/content/<artifact relative name>
+    @GET('builds/id:{build_id}/artifacts/{data_type}/{artifact_relative_name}')
+    def get_build_artifacts_by_build_id(self, build_id, data_type, artifact_relative_name):
         """
         Gets artifacts for a build with ID `build_id`.
 
