@@ -287,6 +287,14 @@ class TeamCity:
         :param build_id: the build ID to get, in format [0-9]+
         """
 
+    @GET('builds/id:{build_id}/resulting-properties')
+    def get_build_parameters_by_build_id(self, build_id):
+        """
+        Gets parameters for a build with ID `build_id`.
+
+        :param build_id: the build ID to get, in format [0-9]+
+        """
+
     @GET('vcs-roots')
     def get_all_vcs_roots(self):
         """
