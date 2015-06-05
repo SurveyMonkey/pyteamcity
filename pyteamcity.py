@@ -91,6 +91,8 @@ class TeamCity:
         self.port = port or int(os.getenv('TEAMCITY_PORT', 0)) or 80
         self.base_url = "http://%s:%d/httpAuth/app/rest" % (
             self.host, self.port)
+        self.guest_auth_base_url = "http://%s:%d/guestAuth" % (
+            self.host, self.port)
         self.session = session or requests.Session()
 
     def _get_request(self, verb, url, **kwargs):
@@ -294,6 +296,18 @@ class TeamCity:
 
         :param build_id: the build ID to get, in format [0-9]+
         """
+
+    def get_build_log_by_build_id(self, build_id):
+        """
+        Gets log for a build with ID `build_id`.
+
+        :param build_id: the build ID to get, in format [0-9]+
+        """
+        url = _build_url(
+            'downloadBuildLog.html?buildId={build_id}'.format(
+                build_id=build_id),
+            base_url=self.guest_auth_base_url)
+        return self._get(url)
 
     @GET('vcs-roots')
     def get_all_vcs_roots(self):
