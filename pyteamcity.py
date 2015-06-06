@@ -5,6 +5,7 @@ RESTful api definition: http://${TeamCity}/guestAuth/app/rest/application.wadl
 import inspect
 import os
 import re
+import textwrap
 
 import requests
 
@@ -42,7 +43,7 @@ def get_default_kwargs(func):
                argspec.defaults)
 
 
-def GET(url_pattern):
+def endpoint(url_pattern, method='GET'):
     def wrapped_func(f):
         def get_url(*args, **kwargs):
             # kwargs with default values declared by function
@@ -67,7 +68,10 @@ def GET(url_pattern):
                 return url
             if return_type == 'request':
                 return request
-            response = self._get(url)
+            if method == 'GET':
+                response = self._get(url)
+            elif method == 'POST':
+                response = self._post(url)
             try:
                 response.raise_for_status()
             except requests.exceptions.HTTPError:
@@ -80,6 +84,14 @@ def GET(url_pattern):
                 return response.text
         return inner_func
     return wrapped_func
+
+
+def GET(url_pattern):
+    return endpoint(url_pattern, method='GET')
+
+
+def POST(url_pattern):
+    return endpoint(url_pattern, method='POST')
 
 
 class TeamCity:
@@ -95,15 +107,22 @@ class TeamCity:
             self.host, self.port)
         self.session = session or requests.Session()
 
-    def _get_request(self, verb, url, **kwargs):
+    def _get_request(self, verb, url, headers=None, **kwargs):
+        if headers is None:
+            headers = {'Accept': 'application/json'}
         return requests.Request(
             verb,
             url,
             auth=(self.username, self.password),
-            headers={'Accept': 'application/json'}).prepare()
+            headers=headers,
+            **kwargs).prepare()
 
     def _get(self, url, **kwargs):
         request = self._get_request('GET', url, **kwargs)
+        return self.session.send(request)
+
+    def _post(self, url, **kwargs):
+        request = self._get_request('POST', url, **kwargs)
         return self.session.send(request)
 
     @GET('server')
@@ -246,6 +265,21 @@ class TeamCity:
         """
         Gets queued builds
         """
+
+    def trigger_build(self, build_type_id):
+        """
+        Trigger a new build
+        """
+        data = textwrap.dedent("""\
+            <build>
+                <buildType id="%s"/>
+            </build>
+            """ % (build_type_id,))
+        url = _build_url('buildQueue', base_url=self.base_url)
+        return self._post(
+            url,
+            headers={'Content-Type': 'application/xml'},
+            data=data)
 
     @GET('projects')
     def _get_all_projects(self):
