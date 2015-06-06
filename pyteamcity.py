@@ -241,6 +241,12 @@ class TeamCity:
                'project': projects}
         return ret
 
+    @GET('buildQueue')
+    def get_queued_builds(self):
+        """
+        Gets queued builds
+        """
+
     @GET('projects')
     def _get_all_projects(self):
         """
