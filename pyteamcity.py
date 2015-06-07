@@ -102,10 +102,16 @@ class TeamCity:
         self.password = password or os.getenv('TEAMCITY_PASSWORD')
         self.host = server or os.getenv('TEAMCITY_HOST')
         self.port = port or int(os.getenv('TEAMCITY_PORT', 0)) or 80
-        self.base_url = "http://%s:%d/httpAuth/app/rest" % (
-            self.host, self.port)
         self.guest_auth_base_url = "http://%s:%d/guestAuth" % (
             self.host, self.port)
+        if self.username and self.password:
+            self.base_url = "http://%s:%d/httpAuth/app/rest" % (
+                self.host, self.port)
+            self.auth = (self.username, self.password)
+        else:
+            self.base_url = "http://%s:%d/guestAuth/app/rest" % (
+                self.host, self.port)
+            self.auth = None
         self.session = session or requests.Session()
 
     def _get_request(self, verb, url, headers=None, **kwargs):
@@ -114,7 +120,7 @@ class TeamCity:
         return requests.Request(
             verb,
             url,
-            auth=(self.username, self.password),
+            auth=self.auth,
             headers=headers,
             **kwargs).prepare()
 
