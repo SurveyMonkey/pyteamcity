@@ -146,7 +146,9 @@ class TeamCity:
         the Client.
         """
 
-    def get_builds(self, build_type_id='', branch='', status='', tags=None,
+    def get_builds(self,
+                   build_type_id='', branch='', status='', running='',
+                   tags=None,
                    user=None, project='',
                    start=0, count=100, **kwargs):
         _get_locator_kwargs = {}
@@ -156,6 +158,8 @@ class TeamCity:
             _get_locator_kwargs['build_type'] = build_type_id
         if status:
             _get_locator_kwargs['status'] = status
+        if running:
+            _get_locator_kwargs['running'] = running
         if tags:
             _get_locator_kwargs['tags'] = tags
         if user:
