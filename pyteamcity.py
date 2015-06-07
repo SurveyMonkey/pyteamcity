@@ -273,23 +273,35 @@ class TeamCity:
         Gets queued builds
         """
 
-    def trigger_build(self, build_type_id):
+    def trigger_build(self, build_type_id, branch=None):
         """
         Trigger a new build
         """
-        data = textwrap.dedent("""\
-            <build>
-                <buildType id="%s"/>
-            </build>
-            """ % (build_type_id,))
         url = _build_url('buildQueue', base_url=self.base_url)
+        data = self._get_build_node(build_type_id, branch)
+
         response = self._post(
             url,
             headers={'Content-Type': 'application/xml'},
             data=data)
+
         root = ET.fromstring(response.text)
-        build_attributes = root.findall('.')[0].attrib
-        return build_attributes
+        new_build_attributes = root.findall('.')[0].attrib
+        return new_build_attributes
+
+    def _get_build_node(self, build_type_id, branch=None):
+        build_attributes = ''
+
+        if branch:
+            build_attributes = 'branchName="%s"' % branch
+
+        data = textwrap.dedent("""\
+            <build %s>
+                <buildType id="%s"/>
+            </build>
+            """ % (build_attributes, build_type_id))
+
+        return data
 
     @GET('projects')
     def _get_all_projects(self):
