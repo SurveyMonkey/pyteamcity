@@ -210,8 +210,8 @@ class TeamCity:
         :param build_id: the build to get, in the format [0-9]+
         """
 
-    @GET('changes')
-    def get_all_changes(self):
+    @GET('changes?start={start}&count={count}')
+    def get_all_changes(self, start=0, count=10):
         """
         Gets all changes made in the TeamCity server pointed to by this
         instance of the Client.
