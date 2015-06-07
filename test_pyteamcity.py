@@ -484,7 +484,8 @@ def test_get_build_tags_by_build_id_kwarg():
 
 
 def test_get_all_changes():
-    expected_url = 'http://TEAMCITY_HOST:4567/httpAuth/app/rest/changes'
+    expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
+                    'changes?start=0&count=10')
     url = tc.get_all_changes(return_type='url')
     assert url == expected_url
 
