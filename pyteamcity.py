@@ -6,6 +6,7 @@ import inspect
 import os
 import re
 import textwrap
+import xml.etree.ElementTree as ET
 
 import requests
 
@@ -276,10 +277,13 @@ class TeamCity:
             </build>
             """ % (build_type_id,))
         url = _build_url('buildQueue', base_url=self.base_url)
-        return self._post(
+        response = self._post(
             url,
             headers={'Content-Type': 'application/xml'},
             data=data)
+        root = ET.fromstring(response.text)
+        build_attributes = root.findall('.')[0].attrib
+        return build_attributes
 
     @GET('projects')
     def _get_all_projects(self):
