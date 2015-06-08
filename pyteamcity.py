@@ -8,6 +8,7 @@ import re
 import textwrap
 import xml.etree.ElementTree as ET
 
+from bs4 import BeautifulSoup
 import requests
 
 
@@ -118,6 +119,7 @@ class TeamCity:
         self.password = password or os.getenv('TEAMCITY_PASSWORD')
         self.host = server or os.getenv('TEAMCITY_HOST')
         self.port = port or int(os.getenv('TEAMCITY_PORT', 0)) or 80
+        self.base_base_url = "http://%s:%d" % (self.host, self.port)
         self.guest_auth_base_url = "http://%s:%d/guestAuth" % (
             self.host, self.port)
         if self.username and self.password:
@@ -129,6 +131,9 @@ class TeamCity:
                 self.host, self.port)
             self.auth = None
         self.session = session or requests.Session()
+
+    def get_url(self, path):
+        return '/'.join([self.base_base_url, path])
 
     def _get_request(self, verb, url, headers=None, **kwargs):
         if headers is None:
@@ -386,6 +391,16 @@ class TeamCity:
 
         :param agent_id: the agent ID to get, in format [0-9]+
         """
+
+    def get_agent_status(self, agent_id):
+        url = self.get_url('/agentDetails.html?id=%s' % agent_id)
+        agent_details_response = self._get(url)
+        html_doc = agent_details_response.text
+        if 'Running build' not in html_doc:
+            return 'Idle'
+        soup = BeautifulSoup(html_doc)
+        item = soup.find(id=re.compile('build:(?P<build_id>\d+):text'))
+        return item.text
 
     @GET('builds/id:{build_id}/statistics')
     def get_build_statistics_by_build_id(self, build_id):
