@@ -277,12 +277,12 @@ class TeamCity:
         Gets queued builds
         """
 
-    def trigger_build(self, build_type_id, branch=None, comment=None):
+    def trigger_build(self, build_type_id, branch=None, comment=None, parameters=None):
         """
         Trigger a new build
         """
         url = _build_url('buildQueue', base_url=self.base_url)
-        data = self._get_build_node(build_type_id, branch, comment)
+        data = self._get_build_node(build_type_id, branch, comment, parameters)
 
         response = self._post(
             url,
@@ -293,23 +293,30 @@ class TeamCity:
         new_build_attributes = root.findall('.')[0].attrib
         return new_build_attributes
 
-    def _get_build_node(self, build_type_id, branch=None, comment=None):
+    def _get_build_node(self, build_type_id, branch=None, comment=None, parameters=None):
         build_attributes = ''
 
         if branch:
             build_attributes = 'branchName="%s"' % branch
 
-        if comment:
-            comment_xml = '<comment><text>%s</text></comment>' % comment
+        if build_attributes:
+            data = '<build %s>\n' % build_attributes
         else:
-            comment_xml = ''
+            data = '<build>\n'
 
-        data = textwrap.dedent("""\
-            <build %s>
-                <buildType id="%s"/>
-                %s
-            </build>
-            """ % (build_attributes, build_type_id, comment_xml))
+        data += '    <buildType id="%s"/>\n' % build_type_id
+
+        if comment:
+            data += '    <comment><text>%s</text></comment>\n' % comment
+
+        if parameters:
+            data += '    <properties>\n'
+            data += ''.join([
+                '        <property name="%s" value="%s"/>\n' % (name, value)
+                for name, value in parameters.items()])
+            data += '    </properties>\n'
+
+        data += '</build>\n'
 
         return data
 
