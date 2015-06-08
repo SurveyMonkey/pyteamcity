@@ -131,6 +131,7 @@ class TeamCity:
                 self.host, self.port)
             self.auth = None
         self.session = session or requests.Session()
+        self._agent_cache = {}
 
     def get_url(self, path):
         return '/'.join([self.base_base_url, path])
@@ -392,15 +393,36 @@ class TeamCity:
         :param agent_id: the agent ID to get, in format [0-9]+
         """
 
-    def get_agent_status(self, agent_id):
+    def get_agent_build_type(self, agent_id):
+        data = self._fetch_agent_details(agent_id)
+        return data['build_type']
+
+    def get_agent_build_text(self, agent_id):
+        data = self._fetch_agent_details(agent_id)
+        return data['build_text']
+
+    def _fetch_agent_details(self, agent_id):
+        data = self._agent_cache.get(agent_id)
+        if data:
+            return data
+
         url = self.get_url('/agentDetails.html?id=%s' % agent_id)
         agent_details_response = self._get(url)
         html_doc = agent_details_response.text
         if 'Running build' not in html_doc:
-            return 'Idle'
-        soup = BeautifulSoup(html_doc)
-        item = soup.find(id=re.compile('build:(?P<build_id>\d+):text'))
-        return item.text
+            build_type = build_text = 'Idle'
+        else:
+            soup = BeautifulSoup(html_doc)
+            build_type_node = soup.find(class_='buildTypeName')
+            build_text_node = soup.find(id=re.compile('build:(?P<build_type>\d+):text'))
+            build_type = build_type_node.text.replace('\n', '').replace('\r', '')
+            build_text = build_text_node.text
+        data = {
+            'build_type': build_type,
+            'build_text': build_text,
+        }
+        self._agent_cache[agent_id] = data
+        return data
 
     @GET('builds/id:{build_id}/statistics')
     def get_build_statistics_by_build_id(self, build_id):
