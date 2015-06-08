@@ -11,6 +11,16 @@ import xml.etree.ElementTree as ET
 import requests
 
 
+class ConnectionError(Exception):
+    def __init__(self, host, port, orig_exception=None):
+        self.host = host
+        self.port = port
+        self.orig_exception = orig_exception
+
+    def __str__(self):
+        return 'Failed to connect to %s:%s' % (self.host, self.port)
+
+
 class HTTPError(Exception):
     url = None
     status_code = None
@@ -96,6 +106,12 @@ def POST(url_pattern):
 
 
 class TeamCity:
+    username = None
+    password = None
+    server = None
+    port = None
+    error_handler = None
+
     def __init__(self, username=None, password=None, server=None, port=None,
                  session=None):
         self.username = username or os.getenv('TEAMCITY_USER')
@@ -126,11 +142,21 @@ class TeamCity:
 
     def _get(self, url, **kwargs):
         request = self._get_request('GET', url, **kwargs)
-        return self.session.send(request)
+        return self._send_request(request)
 
     def _post(self, url, **kwargs):
         request = self._get_request('POST', url, **kwargs)
-        return self.session.send(request)
+        return self._send_request(request)
+
+    def _send_request(self, request):
+        try:
+            return self.session.send(request)
+        except requests.exceptions.ConnectionError as e:
+            new_exception = ConnectionError(self.host, self.port, e)
+            if self.error_handler:
+                self.error_handler(new_exception)
+            else:
+                raise new_exception
 
     @GET('server')
     def get_server_info(self):
