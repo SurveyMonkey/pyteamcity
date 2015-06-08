@@ -1,0 +1,51 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+    method: GET
+    uri: http://teamcity.jetbrains.com/guestAuth/app/rest/changes/id:1765506
+  response:
+    body: {string: !!python/unicode "<html>\r\n<head><title>301 Moved Permanently</title></head>\r\n<body
+        bgcolor=\"white\">\r\n<center><h1>301 Moved Permanently</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"}
+    headers:
+      connection: [keep-alive]
+      content-length: ['178']
+      content-type: [text/html]
+      date: ['Sun, 07 Jun 2015 10:23:53 GMT']
+      location: ['https://teamcity.jetbrains.com/guestAuth/app/rest/changes/id:1765506']
+      server: [nginx]
+    status: {code: 301, message: Moved Permanently}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+    method: GET
+    uri: https://teamcity.jetbrains.com/guestAuth/app/rest/changes/id:1765506
+  response:
+    body: {string: !!python/unicode '{"id":1765506,"version":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","username":"alexander.udalov","date":"20150603T130834+0300","href":"/guestAuth/app/rest/changes/id:1765506","webUrl":"https://teamcity.jetbrains.com/viewModification.html?modId=1765506&personal=false","comment":"Ant
+        task: pass kotlin-runtime to javac''s classpath; simplify tests\n\n''kotlinCompiler''
+        test is deleted because it''s a very roundabout way to compile\nKotlin and
+        Java sources, and there''s no point in testing it.\n\n''javacCompiler'' test
+        is deleted for similar reasons: using javac''s \"compiler\"\noption is not
+        an advertised way to use Kotlin Ant task, and anyway it will work\nwith any
+        CompilerAdapter instance, so it''s hard to break it (apart from\ndeleting
+        \"withKotlin\" adapter).\n\nThere are tests which check compilation/running
+        of the same code but with the\nrecommended method. The pretext for deletion
+        of these tests is to make Ant\ntests generated, and that would be easier if
+        they wouldn''t depend on any outer\nvariables\n","user":{"username":"udalov","name":"Alexander
+        Udalov","id":1419,"href":"/guestAuth/app/rest/users/id:1419"},"files":{"file":[{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"ant/src/org/jetbrains/kotlin/ant/KotlinAntTaskUtil.kt","relative-file":"ant/src/org/jetbrains/kotlin/ant/KotlinAntTaskUtil.kt"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"ant/src/org/jetbrains/kotlin/ant/KotlinCompilerAdapter.java","relative-file":"ant/src/org/jetbrains/kotlin/ant/KotlinCompilerAdapter.java"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/externalAnnotations/build.xml","relative-file":"compiler/testData/integration/ant/jvm/externalAnnotations/build.xml"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/javacCompiler/build.log.expected","relative-file":"compiler/testData/integration/ant/jvm/javacCompiler/build.log.expected"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/javacCompiler/build.xml","relative-file":"compiler/testData/integration/ant/jvm/javacCompiler/build.xml"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/javacCompiler/hello.run.expected","relative-file":"compiler/testData/integration/ant/jvm/javacCompiler/hello.run.expected"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/javacCompiler/root1/hello.kt","relative-file":"compiler/testData/integration/ant/jvm/javacCompiler/root1/hello.kt"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/javacCompiler/root1/j/Java.java","relative-file":"compiler/testData/integration/ant/jvm/javacCompiler/root1/j/Java.java"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/kotlinCompiler/build.log.expected","relative-file":"compiler/testData/integration/ant/jvm/kotlinCompiler/build.log.expected"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/kotlinCompiler/build.xml","relative-file":"compiler/testData/integration/ant/jvm/kotlinCompiler/build.xml"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/kotlinCompiler/hello.run.expected","relative-file":"compiler/testData/integration/ant/jvm/kotlinCompiler/hello.run.expected"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/kotlinCompiler/root1/a/j/annotations.xml","relative-file":"compiler/testData/integration/ant/jvm/kotlinCompiler/root1/a/j/annotations.xml"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/kotlinCompiler/root1/b/j/annotations.xml","relative-file":"compiler/testData/integration/ant/jvm/kotlinCompiler/root1/b/j/annotations.xml"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/kotlinCompiler/root1/hello.kt","relative-file":"compiler/testData/integration/ant/jvm/kotlinCompiler/root1/hello.kt"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/testData/integration/ant/jvm/kotlinCompiler/root1/j/Java.java","relative-file":"compiler/testData/integration/ant/jvm/kotlinCompiler/root1/j/Java.java"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/tests/org/jetbrains/kotlin/integration/AntTaskBaseTest.java","relative-file":"compiler/tests/org/jetbrains/kotlin/integration/AntTaskBaseTest.java"},{"before-revision":"7e24413e9b809b43bc220088868928c137876006","after-revision":"e3df2d0056b58b270b16a3f344f792dc71f1d53e","file":"compiler/tests/org/jetbrains/kotlin/integration/AntTaskJvmTest.java","relative-file":"compiler/tests/org/jetbrains/kotlin/integration/AntTaskJvmTest.java"}]},"vcsRootInstance":{"id":"2383","vcs-root-id":"Kotlin_M11_KotlinBuild","name":"Kotlin
+        @ github:KotlinBuild","href":"/guestAuth/app/rest/vcs-root-instances/id:2383"}}'}
+    headers:
+      cache-control: [no-cache, no-store]
+      connection: [keep-alive]
+      content-type: [application/json]
+      date: ['Sun, 07 Jun 2015 10:23:53 GMT']
+      expires: ['Thu, 01 Jan 1970 00:00:00 GMT']
+      pragma: [no-cache]
+      server: [nginx]
+      set-cookie: [TCSESSIONID=7790B92227214A251A8FD5DA49A778A8; Path=/; Secure; HttpOnly,
+        'RememberMe=""; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/; HttpOnly']
+      strict-transport-security: [max-age=31536000;]
+    status: {code: 200, message: OK}
+version: 1

@@ -1,0 +1,39 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+    method: GET
+    uri: http://teamcity.jetbrains.com/guestAuth/app/rest/builds/?start=0&count=5
+  response:
+    body: {string: !!python/unicode "<html>\r\n<head><title>301 Moved Permanently</title></head>\r\n<body
+        bgcolor=\"white\">\r\n<center><h1>301 Moved Permanently</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"}
+    headers:
+      connection: [keep-alive]
+      content-length: ['178']
+      content-type: [text/html]
+      date: ['Sun, 07 Jun 2015 10:03:03 GMT']
+      location: ['https://teamcity.jetbrains.com/guestAuth/app/rest/builds/?start=0&count=5']
+      server: [nginx]
+    status: {code: 301, message: Moved Permanently}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+    method: GET
+    uri: https://teamcity.jetbrains.com/guestAuth/app/rest/builds/?start=0&count=5
+  response:
+    body: {string: !!python/unicode '{"count":5,"href":"/guestAuth/app/rest/builds/?start=0&count=5","nextHref":"/guestAuth/app/rest/builds/?count=5&start=5","build":[{"id":496513,"buildTypeId":"Genome_PublishExperimentsList","number":"538","status":"SUCCESS","state":"finished","href":"/guestAuth/app/rest/builds/id:496513","webUrl":"https://teamcity.jetbrains.com/viewLog.html?buildId=496513&buildTypeId=Genome_PublishExperimentsList"},{"id":496512,"buildTypeId":"Epigenetics_LongTests","number":"585","status":"FAILURE","state":"finished","branchName":"master","defaultBranch":true,"href":"/guestAuth/app/rest/builds/id:496512","webUrl":"https://teamcity.jetbrains.com/viewLog.html?buildId=496512&buildTypeId=Epigenetics_LongTests"},{"id":496511,"buildTypeId":"Epigenetics_CodeQuality","number":"568","status":"FAILURE","state":"finished","href":"/guestAuth/app/rest/builds/id:496511","webUrl":"https://teamcity.jetbrains.com/viewLog.html?buildId=496511&buildTypeId=Epigenetics_CodeQuality"},{"id":496509,"buildTypeId":"bt219","number":"353","status":"FAILURE","state":"finished","href":"/guestAuth/app/rest/builds/id:496509","webUrl":"https://teamcity.jetbrains.com/viewLog.html?buildId=496509&buildTypeId=bt219"},{"id":496448,"buildTypeId":"Kotlin_BuildKannotatorUsingBarePlugin","number":"51","status":"SUCCESS","state":"finished","branchName":"refs/heads/master","defaultBranch":true,"href":"/guestAuth/app/rest/builds/id:496448","webUrl":"https://teamcity.jetbrains.com/viewLog.html?buildId=496448&buildTypeId=Kotlin_BuildKannotatorUsingBarePlugin"}]}'}
+    headers:
+      cache-control: [no-cache, no-store]
+      connection: [keep-alive]
+      content-type: [application/json]
+      date: ['Sun, 07 Jun 2015 10:03:33 GMT']
+      expires: ['Thu, 01 Jan 1970 00:00:00 GMT']
+      pragma: [no-cache]
+      server: [nginx]
+      set-cookie: [TCSESSIONID=A6B281F4F34A09AB184B74C9CF59DD0B; Path=/; Secure; HttpOnly,
+        'RememberMe=""; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/; HttpOnly']
+      strict-transport-security: [max-age=31536000;]
+    status: {code: 200, message: OK}
+version: 1
