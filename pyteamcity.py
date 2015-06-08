@@ -393,6 +393,26 @@ class TeamCity:
         :param agent_id: the agent ID to get, in format [0-9]+
         """
 
+    def get_agent_statistics(self):
+        num_busy = 0
+        num_idle = 0
+        num_total = 0
+
+        for agent in self.get_agents()['agent']:
+            num_total += 1
+            build_text = self.get_agent_build_text(agent['id'])
+            if 'Idle' in build_text:
+                num_idle += 1
+            else:
+                num_busy += 1
+
+        return {
+            'num_total': num_total,
+            'num_busy': num_busy,
+            'num_idle': num_idle,
+        }
+
+
     def get_agent_build_type(self, agent_id):
         data = self._fetch_agent_details(agent_id)
         return data['build_type']
