@@ -2,6 +2,7 @@
 RESTful api definition: http://${TeamCity}/guestAuth/app/rest/application.wadl
 """
 
+import collections
 import inspect
 import os
 import re
@@ -394,23 +395,17 @@ class TeamCity:
         """
 
     def get_agent_statistics(self):
-        num_busy = 0
-        num_idle = 0
-        num_total = 0
+        counters = collections.Counter()
 
         for agent in self.get_agents()['agent']:
-            num_total += 1
-            build_text = self.get_agent_build_text(agent['id'])
+            counters['num_total'] += 1
+            build_text = self.get_agent_build_type(agent['id'])
             if 'Idle' in build_text:
-                num_idle += 1
+                counters['num_idle'] += 1
             else:
-                num_busy += 1
+                counters['num_busy'] += 1
 
-        return {
-            'num_total': num_total,
-            'num_busy': num_busy,
-            'num_idle': num_idle,
-        }
+        return counters
 
 
     def get_agent_build_type(self, agent_id):
