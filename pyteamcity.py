@@ -277,12 +277,17 @@ class TeamCity:
         Gets queued builds
         """
 
-    def trigger_build(self, build_type_id, branch=None, comment=None, parameters=None):
+    def trigger_build(
+            self,
+            build_type_id, branch=None,
+            comment=None, parameters=None, agent_id=None):
         """
         Trigger a new build
         """
         url = _build_url('buildQueue', base_url=self.base_url)
-        data = self._get_build_node(build_type_id, branch, comment, parameters)
+        data = self._get_build_node(
+            build_type_id, branch,
+            comment, parameters, agent_id)
 
         response = self._post(
             url,
@@ -293,7 +298,10 @@ class TeamCity:
         new_build_attributes = root.findall('.')[0].attrib
         return new_build_attributes
 
-    def _get_build_node(self, build_type_id, branch=None, comment=None, parameters=None):
+    def _get_build_node(
+            self,
+            build_type_id, branch=None,
+            comment=None, parameters=None, agent_id=None):
         build_attributes = ''
 
         if branch:
@@ -305,6 +313,9 @@ class TeamCity:
             data = '<build>\n'
 
         data += '    <buildType id="%s"/>\n' % build_type_id
+
+        if agent_id:
+            data += '    <agent id="%s"/>\n' % agent_id
 
         if comment:
             data += '    <comment><text>%s</text></comment>\n' % comment
