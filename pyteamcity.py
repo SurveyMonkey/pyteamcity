@@ -310,6 +310,14 @@ class TeamCity:
         Gets queued builds
         """
 
+    @GET('buildQueue/id:{build_id}')
+    def get_queued_build_by_build_id(self, build_id):
+        """
+        Gets a queued build with build ID `build_id`.
+
+        :param build_id: the build to get, in the format [0-9]+
+        """
+
     def trigger_build(
             self,
             build_type_id, branch=None,
