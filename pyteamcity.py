@@ -276,8 +276,39 @@ class TeamCity:
         :param build_id: the build to get changes of in the format [0-9]+
         """
 
-    @GET('buildTypes')
-    def get_all_build_types(self):
+    def get_build_types(self, project='', affected_project='',
+                        template_flag=None,
+                        **kwargs):
+        """
+        Gets all build types in the TeamCity server pointed to by this instance
+        of the Client.
+        """
+        _get_locator_kwargs = {}
+        if project:
+            _get_locator_kwargs['project'] = project
+        if affected_project:
+            _get_locator_kwargs['affected_project'] = affected_project
+        if template_flag:
+            _get_locator_kwargs['template_flag'] = template_flag
+
+        locator = self._get_locator(**_get_locator_kwargs)
+
+        if locator:
+            return self._get_all_build_types_locator(
+                locator=locator,
+                **kwargs)
+        else:
+            return self._get_all_build_types(**kwargs)
+
+    @GET('buildTypes/?locator={locator}')
+    def _get_all_build_types_locator(self, locator=''):
+        """
+        Gets all build types in the TeamCity server pointed to by this instance
+        of the Client.
+        """
+
+    @GET('buildTypes/')
+    def _get_all_build_types(self):
         """
         Gets all build types in the TeamCity server pointed to by this instance
         of the Client.
