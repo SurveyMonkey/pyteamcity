@@ -396,10 +396,12 @@ class TeamCity:
 
     def get_agent_statistics(self):
         counters = collections.Counter()
+        counters['by_build_type'] = collections.Counter()
 
         for agent in self.get_agents()['agent']:
             counters['num_total'] += 1
             build_text = self.get_agent_build_type(agent['id'])
+            counters['by_build_type'][build_text] += 1
             if 'Idle' in build_text:
                 counters['num_idle'] += 1
             else:
