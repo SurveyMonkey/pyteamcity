@@ -538,12 +538,12 @@ def test_get_changes_by_build_id_kwarg():
     assert req.url == expected_url
 
 
-def test_get_all_build_types():
-    expected_url = 'http://TEAMCITY_HOST:4567/httpAuth/app/rest/buildTypes'
-    url = tc.get_all_build_types(return_type='url')
+def test_get_build_types():
+    expected_url = 'http://TEAMCITY_HOST:4567/httpAuth/app/rest/buildTypes/'
+    url = tc.get_build_types(return_type='url')
     assert url == expected_url
 
-    req = tc.get_all_build_types(return_type='request')
+    req = tc.get_build_types(return_type='request')
     assert req.method == 'GET'
     assert req.url == expected_url
 
