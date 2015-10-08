@@ -155,6 +155,10 @@ class TeamCity:
         request = self._get_request('POST', url, **kwargs)
         return self._send_request(request)
 
+    def _put(self, url, **kwargs):
+        request = self._get_request('PUT', url, **kwargs)
+        return self._send_request(request)
+
     def _send_request(self, request):
         try:
             return self.session.send(request)
@@ -409,6 +413,16 @@ class TeamCity:
         Gets all projects in the TeamCity server pointed to by this instance of
         the Client.
         """
+
+    def create_project(self, name):
+        """
+        Create project
+        """
+        url = _build_url('projects', base_url=self.base_url)
+        data = {'name': name}
+        headers = {'Content-Type': 'application/json',
+                   'Accept': 'application/json'}
+        return self.session.post(url, json=data, headers=headers)
 
     @GET('projects/id:{project_id}')
     def get_project_by_project_id(self, project_id):
