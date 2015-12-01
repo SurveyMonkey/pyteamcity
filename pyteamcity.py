@@ -578,5 +578,15 @@ class TeamCity:
 
     def get_project_params(self, proj_id):
         """Returns project parameters dictionary with values """
-        proj_params = dict([(x['name'],x['value']) for x in self.get_project_by_project_id(proj_id)['parameters']['property']])
+        proj_params = dict([(x['name'],_catch_keyerror(x)) for x in self.get_project_by_project_id(proj_id)['parameters']['property']])
         return proj_params
+
+    def reset_build_counter(self, build_type_id):
+        """ Resets the build types build counter """
+        url = _build_url('buildTypes',
+                         'id:{build_type_id}'.format(build_type_id = build_type_id),
+                         'settings',
+                         'buildNumberCounter',
+                         base_url= self.base_url)
+        return self.session.put(url=url, auth=(self.username, self.password),data='0')
+    
