@@ -1,0 +1,39 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+    method: GET
+    uri: http://teamcity.jetbrains.com/guestAuth/app/rest/buildQueue
+  response:
+    body: {string: !!python/unicode "<html>\r\n<head><title>301 Moved Permanently</title></head>\r\n<body
+        bgcolor=\"white\">\r\n<center><h1>301 Moved Permanently</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"}
+    headers:
+      connection: [keep-alive]
+      content-length: ['178']
+      content-type: [text/html]
+      date: ['Sun, 07 Jun 2015 10:05:33 GMT']
+      location: ['https://teamcity.jetbrains.com/guestAuth/app/rest/buildQueue']
+      server: [nginx]
+    status: {code: 301, message: Moved Permanently}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+    method: GET
+    uri: https://teamcity.jetbrains.com/guestAuth/app/rest/buildQueue
+  response:
+    body: {string: !!python/unicode '{"count":1,"href":"/guestAuth/app/rest/buildQueue","build":[{"id":478276,"buildTypeId":"bt135","state":"queued","href":"/guestAuth/app/rest/buildQueue/id:478276","webUrl":"https://teamcity.jetbrains.com/viewQueued.html?itemId=478276"}]}'}
+    headers:
+      cache-control: [no-cache, no-store]
+      connection: [keep-alive]
+      content-type: [application/json]
+      date: ['Sun, 07 Jun 2015 10:05:33 GMT']
+      expires: ['Thu, 01 Jan 1970 00:00:00 GMT']
+      pragma: [no-cache]
+      server: [nginx]
+      set-cookie: [TCSESSIONID=7C7406304AE086AD7A43B8C2EDB30409; Path=/; Secure; HttpOnly,
+        'RememberMe=""; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/; HttpOnly']
+      strict-transport-security: [max-age=31536000;]
+    status: {code: 200, message: OK}
+version: 1

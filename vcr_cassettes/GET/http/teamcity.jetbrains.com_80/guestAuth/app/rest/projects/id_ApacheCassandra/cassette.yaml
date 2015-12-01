@@ -1,0 +1,43 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+    method: GET
+    uri: http://teamcity.jetbrains.com/guestAuth/app/rest/projects/id:ApacheCassandra
+  response:
+    body: {string: !!python/unicode "<html>\r\n<head><title>301 Moved Permanently</title></head>\r\n<body
+        bgcolor=\"white\">\r\n<center><h1>301 Moved Permanently</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"}
+    headers:
+      connection: [keep-alive]
+      content-length: ['178']
+      content-type: [text/html]
+      date: ['Sun, 07 Jun 2015 10:15:48 GMT']
+      location: ['https://teamcity.jetbrains.com/guestAuth/app/rest/projects/id:ApacheCassandra']
+      server: [nginx]
+    status: {code: 301, message: Moved Permanently}
+- request:
+    body: null
+    headers:
+      Accept: [application/json]
+    method: GET
+    uri: https://teamcity.jetbrains.com/guestAuth/app/rest/projects/id:ApacheCassandra
+  response:
+    body: {string: !!python/unicode '{"id":"ApacheCassandra","name":"Apache Cassandra","parentProjectId":"_Root","href":"/guestAuth/app/rest/projects/id:ApacheCassandra","webUrl":"https://teamcity.jetbrains.com/project.html?projectId=ApacheCassandra","parentProject":{"id":"_Root","name":"<Root
+        project>","description":"Contains all other projects","href":"/guestAuth/app/rest/projects/id:_Root","webUrl":"https://teamcity.jetbrains.com/project.html?projectId=_Root"},"buildTypes":{"count":2,"buildType":[{"id":"ApacheCassandra_TestsLinux","name":"Tests
+        (Linux)","projectName":"Apache Cassandra","projectId":"ApacheCassandra","href":"/guestAuth/app/rest/buildTypes/id:ApacheCassandra_TestsLinux","webUrl":"https://teamcity.jetbrains.com/viewType.html?buildTypeId=ApacheCassandra_TestsLinux"},{"id":"ApacheCassandra_TestsWindows","name":"Tests
+        (Windows)","projectName":"Apache Cassandra","projectId":"ApacheCassandra","href":"/guestAuth/app/rest/buildTypes/id:ApacheCassandra_TestsWindows","webUrl":"https://teamcity.jetbrains.com/viewType.html?buildTypeId=ApacheCassandra_TestsWindows"}]},"templates":{"count":1,"buildType":[{"id":"ApacheCassandra_TestsTemplat","name":"Tests
+        Template","templateFlag":true,"projectName":"Apache Cassandra","projectId":"ApacheCassandra","href":"/guestAuth/app/rest/buildTypes/id:ApacheCassandra_TestsTemplat"}]},"parameters":{"count":0,"href":"/app/rest/projects/id:ApacheCassandra/parameters","property":[]},"vcsRoots":{"count":1,"href":"/guestAuth/app/rest/vcs-roots?locator=project:(id:ApacheCassandra)"},"projects":{"count":0}}'}
+    headers:
+      cache-control: [no-cache, no-store]
+      connection: [keep-alive]
+      content-type: [application/json]
+      date: ['Sun, 07 Jun 2015 10:15:48 GMT']
+      expires: ['Thu, 01 Jan 1970 00:00:00 GMT']
+      pragma: [no-cache]
+      server: [nginx]
+      set-cookie: [TCSESSIONID=6A71F9415B32F65C44690726845FCE72; Path=/; Secure; HttpOnly,
+        'RememberMe=""; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/; HttpOnly']
+      strict-transport-security: [max-age=31536000;]
+    status: {code: 200, message: OK}
+version: 1
