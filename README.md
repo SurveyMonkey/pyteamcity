@@ -58,7 +58,13 @@ tc.get_build_by_build_id(73450)
 tc.get_server_info()
 tc.get_agents()
 tc.get_all_plugins()
-tc.get_project_params()
+tc.get_project_params('MyProjectId')
+```
+
+### Putting Data
+
+```python
+tc.reset_build_counter(build_type_id='bt232')
 ```
 
 You can also look at [sample.py](sample.py) or
