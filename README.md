@@ -61,7 +61,7 @@ tc.get_all_plugins()
 tc.get_project_params('MyProjectId')
 ```
 
-### Putting Data
+### Resetting a build counter for a build type
 
 ```python
 tc.reset_build_counter(build_type_id='bt232')
