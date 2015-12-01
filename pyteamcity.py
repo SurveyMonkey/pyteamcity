@@ -47,12 +47,6 @@ def _build_url(*args, **kwargs):
     return '/'.join(parts)
 
 
-def _catch_keyerror(y):
-    try:
-        return y['value']
-    except:
-        return None
-
 def get_default_kwargs(func):
     """Returns a sequence of tuples (kwarg_name, default_value) for func"""
     argspec = inspect.getargspec(func)
@@ -578,7 +572,7 @@ class TeamCity:
 
     def get_project_params(self, proj_id):
         """Returns project parameters dictionary with values """
-        proj_params = dict([(x['name'],_catch_keyerror(x)) for x in self.get_project_by_project_id(proj_id)['parameters']['property']])
+        proj_params = dict([(x['name'],x.get('value')) for x in self.get_project_by_project_id(proj_id)['parameters']['property']])
         return proj_params
 
     def reset_build_counter(self, build_type_id):
