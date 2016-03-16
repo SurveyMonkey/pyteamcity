@@ -120,7 +120,7 @@ class TeamCity:
         self.password = password or os.getenv('TEAMCITY_PASSWORD')
         self.host = server or os.getenv('TEAMCITY_HOST')
         self.port = port or int(os.getenv('TEAMCITY_PORT', 0)) or 80
-        self.protocol = protocol or os.getenv('TEAMCITY_PROTOCOL')
+        self.protocol = protocol or os.getenv('TEAMCITY_PROTOCOL', 'http')
         self.base_base_url = "%s://%s:%d" % (
             self.protocol, self.host, self.port)
         self.guest_auth_base_url = "%s://%s:%d/guestAuth" % (
