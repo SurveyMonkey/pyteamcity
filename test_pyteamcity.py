@@ -203,6 +203,7 @@ def test_get_all_plugins():
 
 def make_response(status_code, data):
     response = requests.Response()
+    response.headers['Content-Type'] = 'application/json'
     response.status_code = status_code
     response._content = json.dumps(data).encode('utf-8')
     return response
