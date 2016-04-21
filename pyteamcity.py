@@ -531,6 +531,51 @@ class TeamCity:
         :param build_id: the build ID to get, in format [0-9]+
         """
 
+    def add_build_tags_by_build_id(self, build_id, tags=[]):
+        """
+        Add tags to a build
+
+        :param build_id: the build id to tag, in format [0-9]+
+        :param tag: the tag, or tags. Support strings, or a list of strings.
+        """
+        tags = [ tags ] if not isinstance(tags, list) else tags
+
+        tags_cnt = len(tags)
+        data = { 'count': tags_cnt }
+
+        if tags_cnt > 0:
+            data['tag'] = [ {'name': tag} for tag in tags ]
+
+        url='{0}/builds/id:{1}/tags'.format(self.base_url, build_id)
+        headers = {'Content-Type': 'application/json',
+                   'Accept': 'application/json'}
+
+        return self.session.post(url, json=data, headers=headers)
+
+    def remove_build_tags_by_build_id(self, build_id, tags=[]):
+        """
+        Remove tags by build_id
+
+        :param build_id: the build ID to untag, in format [0-9]+
+        :param tag: the tag, or tags. Support strings, or a list of strings.
+        """
+        # Get current tags
+        data = self.get_build_tags_by_build_id(build_id)
+        if data['count'] <= 0:
+            return data
+
+        # Remove the supplied tags & update count
+        tags = [ tags ] if not isinstance(tags, list) else tags
+        data['tag'] = [ t for t in data['tag'] if t['name'] not in tags ]
+        data['count'] = len(data)
+
+        url='{0}/builds/id:{1}/tags'.format(self.base_url, build_id)
+        headers = {'Content-Type': 'application/json',
+                   'Accept': 'application/json'}
+
+        return self.session.put(url, json=data, headers=headers)
+
+
     @GET('builds/id:{build_id}/resulting-properties')
     def get_build_parameters_by_build_id(self, build_id):
         """
@@ -594,7 +639,7 @@ class TeamCity:
         """
         Pin a build
 
-        :param build_id: the build ID to pin
+        :param build_id: the build ID to pin, in format [0-9]+ 
         """
 
     @DELETE('builds/id:{build_id}/pin')
@@ -602,49 +647,5 @@ class TeamCity:
         """
         Unpin a build
 
-        :param build_id: the build ID to unpin
+        :param build_id: the build ID to unpin, in format [0-9]+
         """
-
-    def add_tags_by_build_id(self, build_id, tags=[]):
-        """
-        Add tags to a build
-
-        :param build_id: the build id to tag
-        :param tag: the tag
-        """
-        tags = [ tags ] if not isinstance(tags, list) else tags
-
-        tags_cnt = len(tags)
-        data = { 'count': tags_cnt }
-
-        if tags_cnt > 0:
-            data['tag'] = [ {'name': tag} for tag in tags ]
-
-        url='{0}/builds/id:{1}/tags'.format(self.base_url, build_id)
-        headers = {'Content-Type': 'application/json',
-                   'Accept': 'application/json'}
-
-        return self.session.post(url, json=data, headers=headers)
-
-    def remove_tags_by_build_id(self, build_id, tags=[]):
-        """
-        Remove tags by build_id
-
-        :param build_id: the build ID to untag
-        :param tags: tags to be removed
-        """
-        # Get current tags
-        data = self.get_build_tags_by_build_id(build_id)
-        if data['count'] <= 0:
-            return data
-
-        # Remove the supplied tags & update count
-        tags = [ tags ] if not isinstance(tags, list) else tags
-        data['tag'] = [ t for t in data['tag'] if t['name'] not in tags ]
-        data['count'] = len(data)
-
-        url='{0}/builds/id:{1}/tags'.format(self.base_url, build_id)
-        headers = {'Content-Type': 'application/json',
-                   'Accept': 'application/json'}
-
-        return self.session.put(url, json=data, headers=headers)
