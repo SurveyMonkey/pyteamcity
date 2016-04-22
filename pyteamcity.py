@@ -203,7 +203,7 @@ class TeamCity:
     def get_builds(self,
                    build_type_id='', branch='', status='', running='',
                    tags=None,
-                   user=None, project='', pinned='',
+                   user=None, project='', pinned='', number='',
                    start=0, count=100, **kwargs):
         _get_locator_kwargs = {}
         if branch:
@@ -222,6 +222,8 @@ class TeamCity:
             _get_locator_kwargs['project'] = project
         if pinned:
             _get_locator_kwargs['pinned'] = pinned
+        if number:
+            _get_locator_kwargs['number'] = number
 
         locator = self._get_locator(**_get_locator_kwargs)
 
