@@ -85,6 +85,10 @@ def endpoint(url_pattern, method='GET'):
                 response = self._get(url)
             elif method == 'POST':
                 response = self._post(url)
+            elif method == 'PUT':
+                response = self._put(url)
+            elif method == 'DELETE':
+                response = self._delete(url)
             try:
                 response.raise_for_status()
             except requests.exceptions.HTTPError:
@@ -99,6 +103,10 @@ def endpoint(url_pattern, method='GET'):
     return wrapped_func
 
 
+def DELETE(url_pattern):
+    return endpoint(url_pattern, method='DELETE')
+
+
 def GET(url_pattern):
     return endpoint(url_pattern, method='GET')
 
@@ -107,29 +115,34 @@ def POST(url_pattern):
     return endpoint(url_pattern, method='POST')
 
 
+def PUT(url_pattern):
+    return endpoint(url_pattern, method='PUT')
+
+
 class TeamCity:
     username = None
     password = None
     server = None
     port = None
+    path = None
     error_handler = None
 
     def __init__(self, username=None, password=None, server=None, port=None,
-                 session=None):
+                 session=None, path=None):
         self.username = username or os.getenv('TEAMCITY_USER')
         self.password = password or os.getenv('TEAMCITY_PASSWORD')
         self.host = server or os.getenv('TEAMCITY_HOST')
         self.port = port or int(os.getenv('TEAMCITY_PORT', 0)) or 80
+        self.path = path or os.getenv('TEAMCITY_PATH')
         self.base_base_url = "http://%s:%d" % (self.host, self.port)
-        self.guest_auth_base_url = "http://%s:%d/guestAuth" % (
-            self.host, self.port)
+        if self.path:
+            self.base_base_url = '/'.join([self.base_base_url, self.path])
+        self.guest_auth_base_url = '/'.join([self.base_base_url, 'guestAuth'])
         if self.username and self.password:
-            self.base_url = "http://%s:%d/httpAuth/app/rest" % (
-                self.host, self.port)
+            self.base_url =  '/'.join([self.base_base_url, 'httpAuth/app/rest'])
             self.auth = (self.username, self.password)
         else:
-            self.base_url = "http://%s:%d/guestAuth/app/rest" % (
-                self.host, self.port)
+            self.base_url = '/'.join([self.base_base_url, 'guestAuth/app/rest'])
             self.auth = None
         self.session = session or requests.Session()
         self._agent_cache = {}
@@ -159,6 +172,10 @@ class TeamCity:
         request = self._get_request('PUT', url, **kwargs)
         return self._send_request(request)
 
+    def _delete(self, url, **kwargs):
+        request = self._get_request('DELETE', url, **kwargs)
+        return self._send_request(request)
+
     def _send_request(self, request):
         try:
             return self.session.send(request)
@@ -186,7 +203,7 @@ class TeamCity:
     def get_builds(self,
                    build_type_id='', branch='', status='', running='',
                    tags=None,
-                   user=None, project='',
+                   user=None, project='', pinned='', number='',
                    start=0, count=100, **kwargs):
         _get_locator_kwargs = {}
         if branch:
@@ -203,6 +220,10 @@ class TeamCity:
             _get_locator_kwargs['user'] = user
         if project:
             _get_locator_kwargs['project'] = project
+        if pinned:
+            _get_locator_kwargs['pinned'] = pinned
+        if number:
+            _get_locator_kwargs['number'] = number
 
         locator = self._get_locator(**_get_locator_kwargs)
 
@@ -512,6 +533,51 @@ class TeamCity:
         :param build_id: the build ID to get, in format [0-9]+
         """
 
+    def add_build_tags_by_build_id(self, build_id, tags=[]):
+        """
+        Add tags to a build
+
+        :param build_id: the build id to tag, in format [0-9]+
+        :param tag: the tag, or tags. Support strings, or a list of strings.
+        """
+        tags = [ tags ] if not isinstance(tags, list) else tags
+
+        tags_cnt = len(tags)
+        data = { 'count': tags_cnt }
+
+        if tags_cnt > 0:
+            data['tag'] = [ {'name': tag} for tag in tags ]
+
+        url='{0}/builds/id:{1}/tags'.format(self.base_url, build_id)
+        headers = {'Content-Type': 'application/json',
+                   'Accept': 'application/json'}
+
+        return self.session.post(url, json=data, headers=headers)
+
+    def remove_build_tags_by_build_id(self, build_id, tags=[]):
+        """
+        Remove tags by build_id
+
+        :param build_id: the build ID to untag, in format [0-9]+
+        :param tag: the tag, or tags. Support strings, or a list of strings.
+        """
+        # Get current tags
+        data = self.get_build_tags_by_build_id(build_id)
+        if data['count'] <= 0:
+            return data
+
+        # Remove the supplied tags & update count
+        tags = [ tags ] if not isinstance(tags, list) else tags
+        data['tag'] = [ t for t in data['tag'] if t['name'] not in tags ]
+        data['count'] = len(data)
+
+        url='{0}/builds/id:{1}/tags'.format(self.base_url, build_id)
+        headers = {'Content-Type': 'application/json',
+                   'Accept': 'application/json'}
+
+        return self.session.put(url, json=data, headers=headers)
+
+
     @GET('builds/id:{build_id}/resulting-properties')
     def get_build_parameters_by_build_id(self, build_id):
         """
@@ -568,4 +634,20 @@ class TeamCity:
         Gets user details for a given username.
 
         :param username: the username to get details for.
+        """
+
+    @PUT('builds/id:{build_id}/pin')
+    def pin_build_by_build_id(self, build_id):
+        """
+        Pin a build
+
+        :param build_id: the build ID to pin, in format [0-9]+ 
+        """
+
+    @DELETE('builds/id:{build_id}/pin')
+    def unpin_build_by_build_id(self, build_id):
+        """
+        Unpin a build
+
+        :param build_id: the build ID to unpin, in format [0-9]+
         """
