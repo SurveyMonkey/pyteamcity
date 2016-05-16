@@ -257,12 +257,35 @@ class TeamCity:
         :param build_id: the build to get, in the format [0-9]+
         """
 
-    @GET('changes?start={start}&count={count}')
-    def get_all_changes(self, start=0, count=10):
+    @GET('changes/?start={start}&count={count}')
+    def _get_all_changes(self, start=0, count=10):
         """
         Gets all changes made in the TeamCity server pointed to by this
         instance of the Client.
         """
+
+    @GET('changes/?locator={locator}&start={start}&count={count}')
+    def _get_all_changes_locator(self, locator='', start=0, count=10):
+        """
+        Gets all changes made in the TeamCity server pointed to by this
+        instance of the Client.
+        """
+
+    def get_changes(self, build_type='', vcs_root='', version='',
+                    start=0, count=10, **kwargs):
+        _get_changes_locator = {}
+        if build_type:
+            _get_changes_locator['build_type_id'] = build_type
+        if vcs_root:
+            _get_changes_locator['vcs_root'] = vcs_root
+        if version:
+            _get_changes_locator['version'] = version
+        locator = self._get_locator(**_get_changes_locator)
+        if locator:
+            return self._get_all_changes_locator(locator, start, count,
+                                                 **kwargs)
+        else:
+            return self._get_all_changes(start, count, **kwargs)
 
     @GET('changes/id:{change_id}')
     def get_change_by_change_id(self, change_id):
