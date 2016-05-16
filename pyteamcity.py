@@ -401,39 +401,31 @@ class TeamCity:
             self,
             build_type_id, branch=None, change_id=None,
             comment=None, parameters=None, agent_id=None):
-        build_attributes = ''
-
+        build_el = ET.Element('build')
         if branch:
-            build_attributes = 'branchName="%s"' % branch
+            build_el.set('branchName', branch)
 
-        if build_attributes:
-            data = '<build %s>\n' % build_attributes
-        else:
-            data = '<build>\n'
-
-        data += '    <buildType id="%s"/>\n' % build_type_id
+        ET.SubElement(build_el, 'buildType').set('id', build_type_id)
 
         if agent_id:
-            data += '    <agent id="%s"/>\n' % agent_id
+            ET.SubElement(build_el, 'agent').set('id', agent_id)
 
         if comment:
-            data += '    <comment><text>%s</text></comment>\n' % comment
+            comment_el = ET.SubElement(build_el, 'comment')
+            ET.SubElement(comment_el, 'text').text = comment
 
         if change_id:
-            data += '    <lastChanges>\n'
-            data += '        <change id="%s"/>\n' % change_id
-            data += '    </lastChanges>\n'
+            last_changes_el = ET.SubElement(build_el, 'lastChanges')
+            ET.SubElement(last_changes_el, 'change').set('id', str(change_id))
 
         if parameters:
-            data += '    <properties>\n'
-            data += ''.join([
-                '        <property name="%s" value="%s"/>\n' % (name, value)
-                for name, value in parameters.items()])
-            data += '    </properties>\n'
+            properties_el = ET.SubElement(build_el, 'properties')
+            for name, value in parameters.items():
+                property_el = ET.SubElement(properties_el, 'property')
+                property_el.set('name', name)
+                property_el.set('value', value)
 
-        data += '</build>\n'
-
-        return data
+        return ET.tostring(build_el)
 
     @GET('projects')
     def _get_all_projects(self):
