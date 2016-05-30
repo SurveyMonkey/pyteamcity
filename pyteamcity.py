@@ -569,3 +569,11 @@ class TeamCity:
 
         :param username: the username to get details for.
         """
+
+    @GET('testOccurrences?locator=test:{test_locator}')
+    def get_test(self, test_locator):
+        """
+        Gets individual test history
+
+        :param test_locator: test id
+        """
