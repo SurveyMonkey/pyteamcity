@@ -379,14 +379,15 @@ class TeamCity:
     def trigger_build(
             self,
             build_type_id, branch=None, change_id=None,
-            comment=None, parameters=None, agent_id=None):
+            comment=None, parameters=None, agent_id=None,
+            snapshot_dependencies=None):
         """
         Trigger a new build
         """
         url = _build_url('buildQueue', base_url=self.base_url)
         data = self._get_build_node(
             build_type_id, branch, change_id,
-            comment, parameters, agent_id)
+            comment, parameters, agent_id, snapshot_dependencies)
 
         response = self._post(
             url,
@@ -400,7 +401,8 @@ class TeamCity:
     def _get_build_node(
             self,
             build_type_id, branch=None, change_id=None,
-            comment=None, parameters=None, agent_id=None):
+            comment=None, parameters=None, agent_id=None,
+            snapshot_dependencies=None):
         build_el = ET.Element('build')
         if branch:
             build_el.set('branchName', branch)
@@ -424,6 +426,13 @@ class TeamCity:
                 property_el = ET.SubElement(properties_el, 'property')
                 property_el.set('name', name)
                 property_el.set('value', value)
+
+        if snapshot_dependencies:
+            snapshot_dependencies_el = ET.SubElement(
+                build_el, 'snapshot-dependencies')
+            for snapshot_dependency_id in snapshot_dependencies:
+                ET.SubElement(snapshot_dependencies_el, 'build').set(
+                    'id', snapshot_dependency_id)
 
         return ET.tostring(build_el)
 
