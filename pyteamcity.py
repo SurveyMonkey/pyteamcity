@@ -447,6 +447,14 @@ class TeamCity:
         :param agent_id: the agent ID to get, in format [0-9]+
         """
 
+    @GET('agents/name:{agent_name}')
+    def get_agent_by_agent_name(self, agent_name):
+        """
+        Gets details for an agent with name `agent_name`.
+
+        :param agent_name: the agent name to get
+        """
+
     def get_agent_statistics(self):
         counters = collections.Counter()
         counters['by_build_type'] = collections.Counter()
