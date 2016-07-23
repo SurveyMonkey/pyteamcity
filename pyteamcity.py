@@ -187,6 +187,7 @@ class TeamCity:
                    build_type_id='', branch='', status='', running='',
                    tags=None,
                    user=None, project='',
+                   since_build=None, until_build=None, since_date=None, until_date=None,
                    start=0, count=100, **kwargs):
         _get_locator_kwargs = {}
         if branch:
@@ -203,6 +204,15 @@ class TeamCity:
             _get_locator_kwargs['user'] = user
         if project:
             _get_locator_kwargs['project'] = project
+        if since_build:
+            _get_locator_kwargs['since_build'] = since_build
+        if until_build:
+            _get_locator_kwargs['until_build'] = until_build
+        if since_date:
+            _get_locator_kwargs['since_date'] = since_date
+        if until_date:
+            _get_locator_kwargs['until_date'] = until_date
+
 
         locator = self._get_locator(**_get_locator_kwargs)
 
