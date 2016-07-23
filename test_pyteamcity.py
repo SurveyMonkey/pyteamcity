@@ -634,3 +634,17 @@ def test_get_build_type_kwarg():
         build_type_id='foo_build', return_type='request')
     assert req.method == 'GET'
     assert req.url == expected_url
+
+
+def test_get_test():
+    expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
+                    'testOccurrences?locator=test:12345')
+
+    url = tc.get_test(
+        test_locator='12345', return_type='url')
+    assert url == expected_url
+
+    req = tc.get_test(
+        test_locator='12345', return_type='request')
+    assert req.method == 'GET'
+    assert req.url == expected_url
