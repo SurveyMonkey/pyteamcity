@@ -76,6 +76,16 @@ def test_get_agent_by_agent_id():
     assert req.url == expected_url
 
 
+def test_get_agent_by_agent_name():
+    expected_url = 'http://TEAMCITY_HOST:4567/httpAuth/app/rest/agents/name:test'
+    url = tc.get_agent_by_agent_name('test', return_type='url')
+    assert url == expected_url
+
+    req = tc.get_agent_by_agent_name('test', return_type='request')
+    assert req.method == 'GET'
+    assert req.url == expected_url
+
+
 def test_get_projects():
     expected_url = 'http://TEAMCITY_HOST:4567/httpAuth/app/rest/projects'
     url = tc.get_projects(return_type='url')
