@@ -597,6 +597,19 @@ class TeamCity:
                             for x in project['parameters']['property']])
         return proj_params
 
+    def reset_build_counter(self, build_type_id, counter=0):
+        """ Resets the build types build counter """
+        url = _build_url(
+            'buildTypes',
+            'id:{build_type_id}'.format(build_type_id = build_type_id),
+            'settings',
+            'buildNumberCounter',
+            base_url= self.base_url)
+        return self.session.put(
+            url=url,
+            auth=(self.username, self.password),
+            data=str(counter))
+
     @GET('testOccurrences?locator=test:{test_locator}')
     def get_test(self, test_locator):
         """
