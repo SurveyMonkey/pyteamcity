@@ -590,6 +590,13 @@ class TeamCity:
         :param username: the username to get details for.
         """
 
+    def get_project_params(self, proj_id):
+        """Returns project parameters dictionary with values """
+        project = self.get_project_by_project_id(proj_id)
+        proj_params = dict([(x['name'], x.get('value'))
+                            for x in project['parameters']['property']])
+        return proj_params
+
     @GET('testOccurrences?locator=test:{test_locator}')
     def get_test(self, test_locator):
         """
