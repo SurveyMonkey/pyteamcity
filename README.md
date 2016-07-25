@@ -1,6 +1,6 @@
 # PyTeamCity
 
-[![Latest Version](https://pypip.in/version/pyteamcity/badge.svg)](https://pypi.python.org/pypi/pyteamcity/)
+[![Latest Version](https://badge.fury.io/py/pyteamcity.svg)](https://pypi.python.org/pypi/pyteamcity/)
 [![Build Status](https://travis-ci.org/SurveyMonkey/pyteamcity.svg?branch=master)](https://travis-ci.org/SurveyMonkey/pyteamcity)
 
 Python interface to the [REST
