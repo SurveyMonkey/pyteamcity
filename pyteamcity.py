@@ -191,7 +191,7 @@ class TeamCity:
     def get_builds(self,
                    build_type_id='', branch='', status='', running='',
                    tags=None,
-                   user=None, project='',
+                   user=None, project='', pinned=None,
                    since_build=None, until_build=None, since_date=None, until_date=None,
                    start=0, count=100, **kwargs):
         _get_locator_kwargs = {}
@@ -209,6 +209,8 @@ class TeamCity:
             _get_locator_kwargs['user'] = user
         if project:
             _get_locator_kwargs['project'] = project
+        if pinned is not None:
+            _get_locator_kwargs['pinned'] = pinned
         if since_build:
             _get_locator_kwargs['since_build'] = since_build
         if until_build:

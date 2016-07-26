@@ -467,6 +467,7 @@ def test_get_builds_by_since_date():
     assert req.method == 'GET'
     assert req.url == expected_url
 
+
 def test_get_builds_by_until_date():
     expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
                     'builds/'
@@ -479,6 +480,23 @@ def test_get_builds_by_until_date():
 
     req = tc.get_builds(
         until_date='untilTestDate',
+        return_type='request')
+    assert req.method == 'GET'
+    assert req.url == expected_url
+
+
+def test_get_builds_by_pinned():
+    expected_url = ('http://TEAMCITY_HOST:4567/httpAuth/app/rest/'
+                    'builds/'
+                    '?locator=pinned:True'
+                    '&start=0&count=100')
+    url = tc.get_builds(
+        pinned=True,
+        return_type='url')
+    assert url == expected_url
+
+    req = tc.get_builds(
+        pinned=True,
         return_type='request')
     assert req.method == 'GET'
     assert req.url == expected_url
