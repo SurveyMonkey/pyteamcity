@@ -274,12 +274,35 @@ class TeamCity:
         :param build_id: the build to get, in the format [0-9]+
         """
 
-    @GET('changes?start={start}&count={count}')
-    def get_all_changes(self, start=0, count=10):
+    @GET('changes/?start={start}&count={count}')
+    def _get_all_changes(self, start=0, count=10):
         """
         Gets all changes made in the TeamCity server pointed to by this
         instance of the Client.
         """
+
+    @GET('changes/?locator={locator}&start={start}&count={count}')
+    def _get_all_changes_locator(self, locator='', start=0, count=10):
+        """
+        Gets all changes made in the TeamCity server pointed to by this
+        instance of the Client.
+        """
+
+    def get_changes(self, build_type='', vcs_root='', version='',
+                    start=0, count=10, **kwargs):
+        _get_changes_locator = {}
+        if build_type:
+            _get_changes_locator['build_type_id'] = build_type
+        if vcs_root:
+            _get_changes_locator['vcs_root'] = vcs_root
+        if version:
+            _get_changes_locator['version'] = version
+        locator = self._get_locator(**_get_changes_locator)
+        if locator:
+            return self._get_all_changes_locator(locator, start, count,
+                                                 **kwargs)
+        else:
+            return self._get_all_changes(start, count, **kwargs)
 
     @GET('changes/id:{change_id}')
     def get_change_by_change_id(self, change_id):
@@ -372,15 +395,16 @@ class TeamCity:
 
     def trigger_build(
             self,
-            build_type_id, branch=None,
-            comment=None, parameters=None, agent_id=None):
+            build_type_id, branch=None, change_id=None,
+            comment=None, parameters=None, agent_id=None,
+            snapshot_dependencies=None):
         """
         Trigger a new build
         """
         url = _build_url('buildQueue', base_url=self.base_url)
         data = self._get_build_node(
-            build_type_id, branch,
-            comment, parameters, agent_id)
+            build_type_id, branch, change_id,
+            comment, parameters, agent_id, snapshot_dependencies)
 
         response = self._post(
             url,
@@ -393,36 +417,41 @@ class TeamCity:
 
     def _get_build_node(
             self,
-            build_type_id, branch=None,
-            comment=None, parameters=None, agent_id=None):
-        build_attributes = ''
-
+            build_type_id, branch=None, change_id=None,
+            comment=None, parameters=None, agent_id=None,
+            snapshot_dependencies=None):
+        build_el = ET.Element('build')
         if branch:
-            build_attributes = 'branchName="%s"' % branch
+            build_el.set('branchName', branch)
 
-        if build_attributes:
-            data = '<build %s>\n' % build_attributes
-        else:
-            data = '<build>\n'
-
-        data += '    <buildType id="%s"/>\n' % build_type_id
+        ET.SubElement(build_el, 'buildType').set('id', build_type_id)
 
         if agent_id:
-            data += '    <agent id="%s"/>\n' % agent_id
+            ET.SubElement(build_el, 'agent').set('id', agent_id)
 
         if comment:
-            data += '    <comment><text>%s</text></comment>\n' % comment
+            comment_el = ET.SubElement(build_el, 'comment')
+            ET.SubElement(comment_el, 'text').text = comment
+
+        if change_id:
+            last_changes_el = ET.SubElement(build_el, 'lastChanges')
+            ET.SubElement(last_changes_el, 'change').set('id', str(change_id))
 
         if parameters:
-            data += '    <properties>\n'
-            data += ''.join([
-                '        <property name="%s" value="%s"/>\n' % (name, value)
-                for name, value in parameters.items()])
-            data += '    </properties>\n'
+            properties_el = ET.SubElement(build_el, 'properties')
+            for name, value in parameters.items():
+                property_el = ET.SubElement(properties_el, 'property')
+                property_el.set('name', name)
+                property_el.set('value', value)
 
-        data += '</build>\n'
+        if snapshot_dependencies:
+            snapshot_dependencies_el = ET.SubElement(
+                build_el, 'snapshot-dependencies')
+            for snapshot_dependency_id in snapshot_dependencies:
+                ET.SubElement(snapshot_dependencies_el, 'build').set(
+                    'id', snapshot_dependency_id)
 
-        return data
+        return ET.tostring(build_el)
 
     @GET('projects')
     def _get_all_projects(self):
