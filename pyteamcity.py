@@ -92,7 +92,10 @@ def endpoint(url_pattern, method='GET'):
                                 url=url,
                                 status_code=response.status_code)
             try:
-                return response.json()
+                if response.headers['Content-Type'] == 'application/json':
+                    return response.json()
+                else:
+                    return response.content
             except Exception as e:
                 return response.text
         return inner_func
