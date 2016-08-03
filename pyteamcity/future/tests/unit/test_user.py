@@ -1,6 +1,6 @@
-from _pyteamcity import v2
+from pyteamcity.future import TeamCity
 
-tc = v2.TeamCity.from_environ()
+tc = TeamCity.from_environ()
 
 
 def test_unit_get_all():

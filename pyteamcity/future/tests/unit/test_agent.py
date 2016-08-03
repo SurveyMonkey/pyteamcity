@@ -1,11 +1,11 @@
-from _pyteamcity import v2
+from pyteamcity.future import Agent, AgentQuerySet, TeamCity
 
-tc = v2.TeamCity.from_environ()
+tc = TeamCity.from_environ()
 
 
 def get_agent_quick(id):
-    query_set = v2.AgentQuerySet(tc)
-    return v2.Agent.from_dict({'id': id}, query_set)
+    query_set = AgentQuerySet(tc)
+    return Agent.from_dict({'id': id}, query_set)
 
 
 def test_unit_get_all():
