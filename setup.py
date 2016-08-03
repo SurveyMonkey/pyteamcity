@@ -25,7 +25,13 @@ setup(
     author_email='yotamoron@yahoo.com',
     py_modules=['pyteamcity'],
     zip_safe=False,
-    install_requires=['beautifulsoup4', 'requests'],
+    install_requires=[
+        'beautifulsoup4',
+        'python-dateutil',
+        'pytz',
+        'requests',
+        'six',
+    ],
     license='MIT',
     classifiers=[
         'Programming Language :: Python :: 2',
