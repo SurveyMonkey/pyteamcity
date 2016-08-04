@@ -1,7 +1,7 @@
 """
 @todo: break into separate modules
-@todo: push v2 branch to GitHub and open WIP PR
-@todo: add notes to README.rst in `master, pointing out v2 work
+@todo: push "future" branch to GitHub and open WIP PR
+@todo: add notes to README.rst in `master, pointing out "future" work
 @todo: Allow creating projects
 @todo: Allow deleting projects
 @todo: Allow creating build types
