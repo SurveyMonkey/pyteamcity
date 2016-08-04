@@ -1,4 +1,5 @@
-from pyteamcity.future import Agent, AgentQuerySet, TeamCity
+from pyteamcity.future import TeamCity
+from pyteamcity.future.agent import Agent, AgentQuerySet
 
 tc = TeamCity.from_environ()
 
