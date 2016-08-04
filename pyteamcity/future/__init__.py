@@ -1,5 +1,4 @@
 """
-@todo: add notes to README.rst in `master, pointing out "future" work
 @todo: Allow creating projects
 @todo: Allow deleting projects
 @todo: Allow creating build types
