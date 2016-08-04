@@ -1,5 +1,4 @@
 """
-@todo: remove surveymonkey references so I can open-source
 @todo: break into separate modules
 @todo: push v2 branch to GitHub and open WIP PR
 @todo: add notes to README.rst in `master, pointing out v2 work
