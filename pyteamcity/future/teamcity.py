@@ -3,6 +3,7 @@ import os
 import requests
 
 from .core.manager import Manager
+from .core.utils import parse_date_string
 
 from .agent import AgentQuerySet
 from .agent_pool import AgentPoolQuerySet
@@ -79,3 +80,55 @@ class TeamCity(object):
             username=os.environ.get('TEAMCITY_USER'),
             password=os.environ.get('TEAMCITY_PASSWORD'),
             server=os.environ.get('TEAMCITY_HOST'))
+
+    @property
+    def server_info(self):
+        url = self.base_url + '/app/rest/server'
+        res = self.session.get(url)
+        res.raise_for_status()
+        data = res.json()
+        return TeamCityServerInfo(
+            version=data['version'],
+            version_major=data['versionMajor'],
+            version_minor=data['versionMinor'],
+            build_number=data['buildNumber'],
+            start_time_str=data['startTime'],
+            current_time_str=data['currentTime'],
+            build_date_str=data['buildDate'],
+            internal_id=data['internalId'],
+            web_url=data['webUrl'])
+
+
+class TeamCityServerInfo(object):
+    def __init__(self,
+                 version, version_major, version_minor, build_number,
+                 start_time_str, current_time_str, build_date_str,
+                 internal_id, web_url):
+        self.version = version
+        self.version_major = version_major
+        self.version_minor = version_minor
+        self.build_number = build_number
+        self.start_time_str = start_time_str
+        self.current_time_str = current_time_str
+        self.build_date_str = build_date_str
+        self.internal_id = internal_id
+        self.web_url = web_url
+
+    def __repr__(self):
+        return '<%s.%s: web_url=%r version=%r>' % (
+            self.__module__,
+            self.__class__.__name__,
+            self.web_url,
+            self.version)
+
+    @property
+    def start_time(self):
+        return parse_date_string(self.start_time_str)
+
+    @property
+    def current_time(self):
+        return parse_date_string(self.current_time_str)
+
+    @property
+    def build_date(self):
+        return parse_date_string(self.build_date_str)
