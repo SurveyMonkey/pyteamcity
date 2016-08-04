@@ -39,6 +39,15 @@ class User(object):
             query_set=query_set,
             data_dict=d)
 
+    @property
+    def groups(self):
+        from .user_group import UserGroup
+
+        ret = []
+        for group in self._data_dict['groups']['group']:
+            ret.append(UserGroup.from_dict(group))
+        return ret
+
 
 class UserQuerySet(QuerySet):
     uri = '/app/rest/users/'

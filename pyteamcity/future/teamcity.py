@@ -10,6 +10,7 @@ from .build import BuildQuerySet
 from .build_type import BuildTypeQuerySet
 from .project import ProjectQuerySet
 from .user import UserQuerySet
+from .user_group import UserGroupQuerySet
 from .vcs_root import VCSRootQuerySet
 
 
@@ -46,6 +47,9 @@ class TeamCity(object):
         self.users = Manager(
             teamcity=self,
             query_set_factory=UserQuerySet)
+        self.user_groups = Manager(
+            teamcity=self,
+            query_set_factory=UserGroupQuerySet)
         self.agents = Manager(
             teamcity=self,
             query_set_factory=AgentQuerySet)
