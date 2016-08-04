@@ -1,5 +1,7 @@
 import itertools
 
+import requests
+
 from .. import exceptions
 from .locator import Locator
 
@@ -41,7 +43,7 @@ class QuerySet(object):
         except requests.HTTPError as e:
             status_code = e.response.status_code
             if status_code == 401:
-                raise UnauthorizedError(
+                raise exceptions.UnauthorizedError(
                     status_code=status_code,
                     msg=str(e),
                     text=e.response.text)
