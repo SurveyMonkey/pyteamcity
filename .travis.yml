@@ -15,6 +15,9 @@ script:
 after_script:
   - |
       env | sort
+      if [ "$TOXENV" == "flake8" ]; then
+          return
+      fi
       if [ $TRAVIS_PULL_REQUEST != false ]; then
           REAL_COMMIT=$(git log -n 1 $TRAVIS_COMMIT_RANGE --format="%H")
           PR_NUM=$TRAVIS_PULL_REQUEST
