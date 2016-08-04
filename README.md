@@ -13,6 +13,25 @@ API](https://confluence.jetbrains.com/display/TCD9/REST+API) of
 pip install pyteamcity
 ```
 
+## New API work-in-progress
+
+Note that I am working on a new API -- see
+https://github.com/SurveyMonkey/pyteamcity/pull/37
+
+Goal here is to create a brand new API that is much more flexible and to
+have nicer code that is easier to work with. The old code encourages
+adding a zillion methods for different ways of filtering. The new code
+has an API with a smaller number of methods that are more consistent and
+more flexible in terms of filtering. It is modeled after the Django ORM
+API.
+
+This is a work-in-progress. Notably missing are `UserGroup` and
+`QueuedBuild` models.
+
+I am probably not going to merge PRs that add things to the old API,
+because I see the new API as the future. I of course am very interested
+in PRs that add things to the new API!
+
 ## Examples
 
 ### Connect to server
