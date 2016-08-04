@@ -1,27 +1,24 @@
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
 from .core.utils import parse_date_string
+from .core.web_browsable import WebBrowsable
 
 from .build_type import BuildType, BuildTypeQuerySet
 from .user import User
 
 
-class QueuedBuild(object):
-    def __init__(self, id, number,
+class QueuedBuild(WebBrowsable):
+    def __init__(self, id,
                  build_type_id,
-                 queued_date_string, start_date_string, finish_date_string,
-                 state, status, branch_name, href,
+                 queued_date_string,
+                 branch_name, href, web_url,
                  build_query_set, data_dict=None):
         self.id = id
-        self.number = number
-        self.queued_date_string = queued_date_string
-        self.start_date_string = start_date_string
-        self.finish_date_string = finish_date_string
         self.build_type_id = build_type_id
-        self.state = state
-        self.status = status
+        self.queued_date_string = queued_date_string
         self.branch_name = branch_name
         self.href = href
+        self.web_url = web_url
         self.build_query_set = build_query_set
         self._data_dict = data_dict
 
@@ -35,18 +32,6 @@ class QueuedBuild(object):
         return parse_date_string(self.queued_date_string)
 
     @property
-    def start_date(self):
-        return parse_date_string(self.start_date_string)
-
-    @property
-    def finish_date(self):
-        return parse_date_string(self.finish_date_string)
-
-    @property
-    def agent(self):
-        return Agent.from_dict(self._data_dict.get('agent'))
-
-    @property
     def build_type(self):
         teamcity = self.build_query_set.teamcity
         if 'buildType' in self._data_dict:
@@ -58,26 +43,21 @@ class QueuedBuild(object):
         return build_type
 
     def __repr__(self):
-        return '<%s.%s: id=%r build_type_id=%r number=%r>' % (
+        return '<%s.%s: id=%r build_type_id=%r>' % (
             self.__module__,
             self.__class__.__name__,
             self.id,
-            self.build_type_id,
-            self.number)
+            self.build_type_id)
 
     @classmethod
     def from_dict(cls, d, build_query_set):
-        return QueuedBuild(
+        return cls(
             id=d.get('id'),
-            number=d.get('number'),
-            queued_date_string=d.get('queuedDate'),
-            start_date_string=d.get('startDate'),
-            finish_date_string=d.get('finishDate'),
             build_type_id=d.get('buildTypeId'),
-            state=d.get('state'),
-            status=d.get('status'),
+            queued_date_string=d.get('queuedDate'),
             branch_name=d.get('branchName'),
             href=d.get('href'),
+            web_url=d.get('webUrl'),
             build_query_set=build_query_set,
             data_dict=d)
 
@@ -102,50 +82,19 @@ class QueuedBuildQuerySet(QuerySet):
 
     def filter(self,
                id=None,
-               project=None, affected_project=None,
-               build_type=None, number=None, branch=None, user=None,
-               tags=None, pinned=None,
-               since_build=None, since_date=None, status=None,
-               agent_name=None, personal=None,
-               canceled=None, failed_to_start=None, running=None,
+               project=None,
+               build_type=None, branch=None, user=None,
                start=None, count=None, lookup_limit=None):
         if id is not None:
             self._add_pred('id', id)
         if project is not None:
             self._add_pred('project', '(%s)' % project)
-        if affected_project is not None:
-            self._add_pred('affectedProject', '(%s)' % affected_project)
         if build_type is not None:
             self._add_pred('buildType', build_type)
-        if number is not None:
-            self._add_pred('number', number)
         if branch is not None:
             self._add_pred('branch', branch)
         if user is not None:
             self._add_pred('user', '(%s)' % user)
-        if tags is not None:
-            if not hasattr(tags, 'split'):
-                tags = ','.join(tags)
-            self._add_pred('tags', tags)
-        if pinned is not None:
-            self._add_pred('pinned', pinned)
-        if since_build is not None:
-            self._add_pred('sinceBuild', '(%s)' % since_build)
-        if since_date is not None:
-            since_date = self._get_since_date(since_date)
-            self._add_pred('sinceDate', since_date)
-        if status is not None:
-            self._add_pred('status', status)
-        if agent_name is not None:
-            self._add_pred('agentName', agent_name)
-        if personal is not None:
-            self._add_pred('personal', personal)
-        if canceled is not None:
-            self._add_pred('canceled', canceled)
-        if failed_to_start is not None:
-            self._add_pred('failedToStart', failed_to_start)
-        if running is not None:
-            self._add_pred('running', running)
         if start is not None:
             self._add_pred('start', start)
         if count is not None:
@@ -153,17 +102,6 @@ class QueuedBuildQuerySet(QuerySet):
         if lookup_limit is not None:
             self._add_pred('lookupLimit', lookup_limit)
         return self
-
-    def _get_since_date(self, since_date):
-        if hasattr(since_date, 'strftime'):
-            since_date = since_date.strftime('%Y%m%dT%H%M%S%z')
-
-        # If there's no timezone, assume UTC
-        if '+' not in since_date:
-            since_date += '+0000'
-
-        since_date = quote(since_date)
-        return since_date
 
     def __iter__(self):
         return (self._entity_factory.from_dict(d, self)

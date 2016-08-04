@@ -9,6 +9,7 @@ from .agent_pool import AgentPoolQuerySet
 from .build import BuildQuerySet
 from .build_type import BuildTypeQuerySet
 from .project import ProjectQuerySet
+from .queued_build import QueuedBuildQuerySet
 from .user import UserQuerySet
 from .user_group import UserGroupQuerySet
 from .vcs_root import VCSRootQuerySet
@@ -44,6 +45,9 @@ class TeamCity(object):
         self.builds = Manager(
             teamcity=self,
             query_set_factory=BuildQuerySet)
+        self.queued_builds = Manager(
+            teamcity=self,
+            query_set_factory=QueuedBuildQuerySet)
         self.users = Manager(
             teamcity=self,
             query_set_factory=UserQuerySet)
