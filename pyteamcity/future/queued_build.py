@@ -1,15 +1,12 @@
-from six.moves.urllib.parse import quote
-
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
 from .core.utils import parse_date_string
 
-from .agent import Agent
 from .build_type import BuildType, BuildTypeQuerySet
 from .user import User
 
 
-class Build(object):
+class QueuedBuild(object):
     def __init__(self, id, number,
                  build_type_id,
                  queued_date_string, start_date_string, finish_date_string,
@@ -70,7 +67,7 @@ class Build(object):
 
     @classmethod
     def from_dict(cls, d, build_query_set):
-        return Build(
+        return QueuedBuild(
             id=d.get('id'),
             number=d.get('number'),
             queued_date_string=d.get('queuedDate'),
@@ -99,9 +96,9 @@ class Build(object):
         return d
 
 
-class BuildQuerySet(QuerySet):
-    uri = '/app/rest/builds/'
-    _entity_factory = Build
+class QueuedBuildQuerySet(QuerySet):
+    uri = '/app/rest/buildQueue/'
+    _entity_factory = QueuedBuild
 
     def filter(self,
                id=None,
@@ -169,5 +166,5 @@ class BuildQuerySet(QuerySet):
         return since_date
 
     def __iter__(self):
-        return (Build.from_dict(d, self)
-                for d in self._data()['build'])
+        return (self._entity_factory.from_dict(d, self)
+                for d in self._data().get('build', []))

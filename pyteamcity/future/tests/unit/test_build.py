@@ -88,7 +88,8 @@ def test_unit_filter_by_affected_project():
     builds = tc.builds.all().filter(
         affected_project='Dummysvc_ReleaseToMt1',
         count=5)
-    assert '?locator=affectedProject:(Dummysvc_ReleaseToMt1)' in builds._get_url()
+    query_string = '?locator=affectedProject:(Dummysvc_ReleaseToMt1)'
+    assert query_string in builds._get_url()
 
     builds = tc.builds.all().filter(
         affected_project='Dummysvc',
@@ -100,7 +101,8 @@ def test_unit_filter_by_build_type():
     builds = tc.builds.all().filter(
         build_type='DevOps_Metacloud_DeleteOldVMs',
         count=3)
-    assert '?locator=buildType:DevOps_Metacloud_DeleteOldVMs' in builds._get_url()
+    query_string = '?locator=buildType:DevOps_Metacloud_DeleteOldVMs'
+    assert query_string in builds._get_url()
 
 
 def test_unit_filter_by_number():

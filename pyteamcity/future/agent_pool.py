@@ -31,7 +31,6 @@ class AgentPool(object):
     def agents(self):
         from .agent import Agent
 
-        teamcity = self.query_set.teamcity
         ret = []
         for agent in self._data_dict['agents']['agent']:
             ret.append(Agent.from_dict(agent))
@@ -39,7 +38,6 @@ class AgentPool(object):
 
     @property
     def projects(self):
-        teamcity = self.query_set.teamcity
         ret = []
         for project in self._data_dict['projects']['project']:
             ret.append(Project.from_dict(project))

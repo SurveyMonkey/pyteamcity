@@ -92,7 +92,7 @@ class Agent(object):
         url = self._get_url() + '/' + relative_uri
         headers = dict(self.teamcity.session.headers)
         headers.update(extra_headers)
-        req= requests.Request(
+        req = requests.Request(
             method='PUT',
             url=url,
             data=data,

@@ -9,5 +9,5 @@
 @todo: docstrings for classes
 """
 
-from .page_joiner import PageJoiner
-from .teamcity import TeamCity
+from .page_joiner import PageJoiner  # noqa
+from .teamcity import TeamCity  # noqa
