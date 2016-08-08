@@ -15,7 +15,8 @@ script:
 after_script:
   - |
       env | sort
-      if [ "$TOXENV" == "flake8" ]; then
+      if [ ! -f coverage.xml ]; then
+          echo "No coverage.xml found; skipping sending coverage to couverture.io"
           return
       fi
       if [ $TRAVIS_PULL_REQUEST != false ]; then
