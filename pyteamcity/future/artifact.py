@@ -79,10 +79,7 @@ class Artifact(object):
         return res.content
 
     def get_artifact_by_path(self, path):
-        artifact = self
-        for path_component in path.split('/'):
-            artifact = artifact.listdir(path_component)[0]
-        return artifact
+        return Artifact(build=self.build, path=self.path + '/' + path)
 
     def __div__(self, path):
         return self.get_artifact_by_path(path)
