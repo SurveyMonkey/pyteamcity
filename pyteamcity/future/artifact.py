@@ -18,6 +18,7 @@ class Artifact(object):
                 reason=res.reason,
                 text=res.text)
         self._data = res.json()
+        self._metadata_url = url
 
     @property
     def name(self):
