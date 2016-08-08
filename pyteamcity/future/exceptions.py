@@ -10,6 +10,10 @@ class InvalidLocatorDimension(Error):
     pass
 
 
+class IllegalOperation(Error):
+    pass
+
+
 class HTTPError(Error):
     def __init__(self, status_code, msg, text):
         self.status_code = status_code

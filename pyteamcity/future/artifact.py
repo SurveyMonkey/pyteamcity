@@ -1,6 +1,7 @@
 import fnmatch
 import os
 
+from . import exceptions
 from .core.utils import parse_date_string
 
 
@@ -58,8 +59,10 @@ class Artifact(object):
             self.size)
 
     def content(self):
-        if self.content_href is None:
-            return None
+        if not self.isfile():
+            raise exceptions.IllegalOperation(
+                'Calling the `content` method on a non-file artifact'
+                ' (%r) is not allowed' % self)
         teamcity = self.build.build_query_set.teamcity
         url = teamcity.base_base_url + self.content_href
         res = teamcity.session.get(url)
