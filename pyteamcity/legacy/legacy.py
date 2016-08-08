@@ -1,4 +1,11 @@
 """
+pyteamcity/legacy/legacy.py
+
+This is the legacy API and will probably not be maintained going forward.
+
+Before using this or making changes to this file, be sure to have a look at
+`pyteamcity/future`.
+
 RESTful api definition: http://${TeamCity}/guestAuth/app/rest/application.wadl
 """
 
