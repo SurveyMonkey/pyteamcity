@@ -13,10 +13,13 @@ class Artifact(object):
         url = self.build.api_url + '/artifacts/metadata/' + self.path
         res = teamcity.session.get(url)
         if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+            if res.status_code == 404:
+                raise exceptions.ArtifactNotFound(path=path)
+            else:
+                raise exceptions.HTTPError(
+                    status_code=res.status_code,
+                    reason=res.reason,
+                    text=res.text)
         self._data = res.json()
         self._metadata_url = url
 

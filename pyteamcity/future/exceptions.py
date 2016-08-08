@@ -14,6 +14,14 @@ class IllegalOperation(Error):
     pass
 
 
+class ArtifactNotFound(Error):
+    def __init__(self, path):
+        self.path = path
+
+    def __str__(self):
+        return 'Artifact not found: %s' % self.path
+
+
 class HTTPError(Error):
     def __init__(self, status_code, reason, text):
         self.status_code = status_code
