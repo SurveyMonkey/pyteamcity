@@ -5,6 +5,7 @@ from .core.queryset import QuerySet
 from .core.utils import parse_date_string
 
 from .agent import Agent
+from .artifact import Artifact
 from .build_type import BuildType, BuildTypeQuerySet
 from .user import User
 
@@ -97,6 +98,17 @@ class Build(object):
             d[param['name']] = param_obj
 
         return d
+
+    @property
+    def api_url(self):
+        teamcity = self.build_query_set.teamcity
+        base_url = teamcity.base_url
+        url = base_url + '/app/rest/builds/id:%s' % self.id
+        return url
+
+    @property
+    def artifacts(self):
+        return Artifact(build=self)
 
 
 class BuildQuerySet(QuerySet):

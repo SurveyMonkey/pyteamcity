@@ -65,13 +65,14 @@ class TeamCity(object):
             teamcity=self,
             query_set_factory=VCSRootQuerySet)
 
+        self.base_base_url = "%s://%s:%d" % (
+            self.protocol, self.server, self.port)
+
         if self.username and self.password:
-            self.base_url = "%s://%s:%d/httpAuth" % (
-                self.protocol, self.server, self.port)
+            self.base_url = self.base_base_url + '/httpAuth'
             self.auth = (self.username, self.password)
         else:
-            self.base_url = "%s://%s:%d/guestAuth" % (
-                self.protocol, self.server, self.port)
+            self.base_url = self.base_base_url + '/guestAuth'
             self.auth = None
 
     @classmethod
