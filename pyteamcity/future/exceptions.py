@@ -15,13 +15,13 @@ class IllegalOperation(Error):
 
 
 class HTTPError(Error):
-    def __init__(self, status_code, msg, text):
+    def __init__(self, status_code, reason, text):
         self.status_code = status_code
-        self.msg = msg
+        self.reason = reason
         self.text = text
 
     def __str__(self):
-        return self.msg
+        return self.reason
 
 
 class UnauthorizedError(HTTPError):

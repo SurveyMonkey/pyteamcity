@@ -12,7 +12,11 @@ class Artifact(object):
         teamcity = self.build.build_query_set.teamcity
         url = self.build.api_url + '/artifacts/metadata/' + self.path
         res = teamcity.session.get(url)
-        res.raise_for_status()
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
         self._data = res.json()
 
     @property
@@ -66,7 +70,11 @@ class Artifact(object):
         teamcity = self.build.build_query_set.teamcity
         url = teamcity.base_base_url + self.content_href
         res = teamcity.session.get(url)
-        res.raise_for_status()
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
         return res.content
 
     def get_artifact_by_path(self, path):
@@ -82,7 +90,11 @@ class Artifact(object):
         teamcity = self.build.build_query_set.teamcity
         url = self.build.api_url + '/artifacts/children/' + self.path
         res = teamcity.session.get(url)
-        res.raise_for_status()
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
         data = res.json()
         if data.get('count', 0) == 0 or 'file' not in data:
             return []

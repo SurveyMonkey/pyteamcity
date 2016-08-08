@@ -86,7 +86,11 @@ class TeamCity(object):
     def server_info(self):
         url = self.base_url + '/app/rest/server'
         res = self.session.get(url)
-        res.raise_for_status()
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
         data = res.json()
         return TeamCityServerInfo(
             version=data['version'],
