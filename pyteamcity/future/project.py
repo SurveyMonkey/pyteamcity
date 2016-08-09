@@ -1,3 +1,4 @@
+from . import exceptions
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
 from .core.web_browsable import WebBrowsable
@@ -6,7 +7,7 @@ from .core.web_browsable import WebBrowsable
 class Project(WebBrowsable):
     def __init__(self, id, name, description,
                  href, web_url, parent_project_id,
-                 project_query_set,
+                 teamcity, project_query_set,
                  data_dict=None):
         self.id = id
         self.name = name
@@ -14,7 +15,10 @@ class Project(WebBrowsable):
         self.href = href
         self.web_url = web_url
         self.parent_project_id = parent_project_id
+        self.teamcity = teamcity
         self.project_query_set = project_query_set
+        if self.teamcity is None and self.project_query_set is not None:
+            self.teamcity = self.project_query_set.teamcity
         self._data_dict = data_dict
 
     def __repr__(self):
@@ -25,7 +29,7 @@ class Project(WebBrowsable):
             self.name)
 
     @classmethod
-    def from_dict(cls, d, project_query_set=None):
+    def from_dict(cls, d, project_query_set=None, teamcity=None):
         return Project(
             id=d.get('id'),
             name=d.get('name'),
@@ -33,6 +37,7 @@ class Project(WebBrowsable):
             href=d.get('href'),
             web_url=d.get('webUrl'),
             parent_project_id=d.get('parentProjectId'),
+            teamcity=teamcity,
             project_query_set=project_query_set,
             data_dict=d)
 
@@ -69,6 +74,16 @@ class Project(WebBrowsable):
 
         return d
 
+    def delete(self):
+        url = self.teamcity.base_base_url + self.href
+        res = self.teamcity.session.delete(url)
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
+        return url
+
 
 class ProjectQuerySet(QuerySet):
     uri = '/app/rest/projects/'
@@ -83,3 +98,31 @@ class ProjectQuerySet(QuerySet):
 
     def __iter__(self):
         return (Project.from_dict(d, self) for d in self._data()['project'])
+
+    def create(self, name, id=None, parent_project_locator='id:_Root'):
+        url = self.base_url
+        attrs_dict = {'name': name}
+        if id is not None:
+            attrs_dict['id'] = id
+        attrs = ' '.join([
+            '%s="%s"' % (k, v) for k, v in attrs_dict.items()
+        ])
+        xml = """
+            <newProjectDescription {attrs}>
+              <parentProject locator='{parent_project_locator}'/>
+            </newProjectDescription>
+            """.format(
+                attrs=attrs,
+                parent_project_locator=parent_project_locator)
+        res = self.teamcity.session.post(
+            url=url,
+            headers={'Content-Type': 'application/xml'},
+            allow_redirects=False,
+            data=xml)
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
+        project = Project.from_dict(res.json(), teamcity=self.teamcity)
+        return project
