@@ -28,13 +28,13 @@ class TeamCity(object):
 
     def __init__(self,
                  username=None, password=None,
-                 protocol='http', server='127.0.0.1', port=80,
+                 protocol='http', server='127.0.0.1', port=None,
                  session=None):
         self.username = username
         self.password = password
         self.protocol = protocol
         self.server = server
-        self.port = port
+        self.port = port or (443 if protocol == 'https' else 80)
         self.session = session or requests.Session()
         self.session.auth = (username, password)
         self.session.headers['Accept'] = 'application/json'
@@ -79,6 +79,7 @@ class TeamCity(object):
     @classmethod
     def from_environ(cls):
         return TeamCity(
+            protocol=os.environ.get('TEAMCITY_PROTO'),
             username=os.environ.get('TEAMCITY_USER'),
             password=os.environ.get('TEAMCITY_PASSWORD'),
             server=os.environ.get('TEAMCITY_HOST'))
