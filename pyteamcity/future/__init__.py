@@ -1,6 +1,4 @@
 """
-@todo: Allow creating build types
-@todo: Allow deleting build types
 @todo: Allow pausing build types
 @todo: Allow triggering builds
 @todo: Allow canceling builds

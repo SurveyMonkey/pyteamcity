@@ -1,3 +1,4 @@
+from . import exceptions
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
 
@@ -6,7 +7,7 @@ class BuildType(object):
     def __init__(self, id, name, description, href, web_url,
                  project_id, project_name,
                  paused, template_flag,
-                 build_type_query_set, data_dict=None):
+                 teamcity, build_type_query_set, data_dict=None):
         self.id = id
         self.name = name
         self.description = description
@@ -16,7 +17,10 @@ class BuildType(object):
         self.project_name = project_name
         self.paused = paused
         self.template_flag = template_flag
+        self.teamcity = teamcity
         self.build_type_query_set = build_type_query_set
+        if self.teamcity is None and self.build_type_query_set is not None:
+            self.teamcity = self.build_type_query_set.teamcity
         self._data_dict = data_dict
 
     def __repr__(self):
@@ -28,7 +32,7 @@ class BuildType(object):
             self.project_name)
 
     @classmethod
-    def from_dict(cls, d, build_type_query_set=None):
+    def from_dict(cls, d, build_type_query_set=None, teamcity=None):
         return BuildType(
             id=d.get('id'),
             name=d.get('name'),
@@ -40,6 +44,7 @@ class BuildType(object):
             paused=d.get('paused'),
             template_flag=d.get('templateFlag'),
             build_type_query_set=build_type_query_set,
+            teamcity=teamcity,
             data_dict=d)
 
     @property
@@ -62,6 +67,16 @@ class BuildType(object):
             d[param['name']] = param_obj
 
         return d
+
+    def delete(self):
+        url = self.teamcity.base_base_url + self.href
+        res = self.teamcity.session.delete(url)
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
+        return url
 
 
 class BuildTypeQuerySet(QuerySet):

@@ -1,4 +1,5 @@
 from . import exceptions
+from .build_type import BuildType
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
 from .core.web_browsable import WebBrowsable
@@ -37,8 +38,8 @@ class Project(WebBrowsable):
             href=d.get('href'),
             web_url=d.get('webUrl'),
             parent_project_id=d.get('parentProjectId'),
-            teamcity=teamcity,
             project_query_set=project_query_set,
+            teamcity=teamcity,
             data_dict=d)
 
     @property
@@ -83,6 +84,24 @@ class Project(WebBrowsable):
                 reason=res.reason,
                 text=res.text)
         return url
+
+    def create_build_type(self, name):
+        """
+        Add an empty build type with name `name` to the project
+        """
+
+        url = self.teamcity.base_base_url + self.href + '/buildTypes'
+        res = self.teamcity.session.post(
+            url=url,
+            headers={'Content-Type': 'text/plain'},
+            data=name)
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
+        build_type = BuildType.from_dict(res.json(), teamcity=self.teamcity)
+        return build_type
 
 
 class ProjectQuerySet(QuerySet):
