@@ -25,9 +25,6 @@ has an API with a smaller number of methods that are more consistent and
 more flexible in terms of filtering. It is modeled after the Django ORM
 API.
 
-This is a work-in-progress. Notably missing are `UserGroup` and
-`QueuedBuild` models.
-
 I am probably not going to merge PRs that add things to the old API,
 because I see the new API as the future. I of course am very interested
 in PRs that add things to the new API!
