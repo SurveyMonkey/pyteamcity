@@ -81,6 +81,22 @@ class BuildType(object):
                 reason=res.reason,
                 text=res.text)
 
+    def reset_build_counter(self, counter):
+        url = ''.join([
+            self.teamcity.base_base_url,
+            self.href,
+            '/settings/buildNumberCounter'])
+        res = self.teamcity.session.put(
+            url=url,
+            headers={'Content-Type': 'text/plain',
+                     'Accept': 'text/plain'},
+            data=str(counter))
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
+
     def delete(self):
         url = self.teamcity.base_base_url + self.href
         res = self.teamcity.session.delete(url)
