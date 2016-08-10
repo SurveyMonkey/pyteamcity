@@ -15,8 +15,7 @@ pip install pyteamcity
 
 ## New API work-in-progress
 
-Note that I am working on a new API -- see
-https://github.com/SurveyMonkey/pyteamcity/pull/37
+Note that I am working on a new API currently called [`pyteamcity.future`](pyteamcity/future) (initially added in [#37](https://github.com/SurveyMonkey/pyteamcity/pull/37)).
 
 Goal here is to create a brand new API that is much more flexible and to
 have nicer code that is easier to work with. The old code encourages
