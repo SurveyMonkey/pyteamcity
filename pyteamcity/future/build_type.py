@@ -68,6 +68,19 @@ class BuildType(object):
 
         return d
 
+    def set_paused(self, bool):
+        url = self.teamcity.base_base_url + self.href + '/paused'
+        res = self.teamcity.session.put(
+            url=url,
+            headers={'Content-Type': 'text/plain',
+                     'Accept': 'text/plain'},
+            data='true' if bool else 'false')
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
+
     def delete(self):
         url = self.teamcity.base_base_url + self.href
         res = self.teamcity.session.delete(url)

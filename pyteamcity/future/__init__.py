@@ -1,5 +1,4 @@
 """
-@todo: Allow pausing build types
 @todo: Allow triggering builds
 @todo: Allow canceling builds
 @todo: docstrings for classes
