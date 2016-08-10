@@ -39,7 +39,9 @@ class QueuedBuild(WebBrowsable):
     def build_type(self):
         teamcity = self.teamcity
         if 'buildType' in self._data_dict:
-            build_type = BuildType.from_dict(self._data_dict.get('buildType'))
+            build_type = BuildType.from_dict(
+                self._data_dict.get('buildType'),
+                teamcity=teamcity)
         elif 'buildTypeId' in self._data_dict:
             build_type_id = self._data_dict['buildTypeId']
             build_type = BuildTypeQuerySet(teamcity).get(id=build_type_id)

@@ -51,7 +51,7 @@ class BuildType(object):
     def project(self):
         from .project import ProjectQuerySet
 
-        teamcity = self.build_type_query_set.teamcity
+        teamcity = self.teamcity
         return ProjectQuerySet(teamcity).get(id=self.project_id)
 
     @property
