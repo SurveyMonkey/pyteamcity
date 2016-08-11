@@ -66,8 +66,12 @@ class TeamCity(object):
             teamcity=self,
             query_set_factory=VCSRootQuerySet)
 
-        self.base_base_url = "%s://%s:%d" % (
-            self.protocol, self.server, self.port)
+        self.base_base_url = "%s://%s" % (
+            self.protocol, self.server)
+        if self.protocol == 'http' and self.port != 80:
+            self.base_base_url += ':%d' % self.port
+        if self.protocol == 'https' and self.port != 443:
+            self.base_base_url += ':%d' % self.port
 
         if self.username and self.password:
             self.base_url = self.base_base_url + '/httpAuth'

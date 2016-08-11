@@ -1,10 +1,124 @@
 import datetime
 
+import pytest
 import responses
 
-from pyteamcity.future import TeamCity
+from pyteamcity.future import exceptions, TeamCity
 
 tc = TeamCity(username='user', password='password')
+
+
+@responses.activate
+def test_pin():
+    response_json = {
+        "id": 1467264,
+        "buildTypeId": "Dummysvc_Branches_Py27",
+        "number": "141",
+        "href": "/httpAuth/app/rest/builds/id:1467264",
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:1467264'),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+    responses.add(
+        responses.PUT,
+        tc.relative_url('app/rest/builds/id:1467264/pin'),
+        status=204,
+    )
+
+    build = tc.builds.all().get(id=1467264)
+    build.pin('marca testing pinning')
+
+    assert len(responses.calls) == 2
+    req1 = responses.calls[0].request
+    assert req1.method == 'GET'
+    assert req1.url == tc.relative_url('app/rest/builds/id:1467264')
+    req2 = responses.calls[1].request
+    assert req2.url == tc.relative_url('app/rest/builds/id:1467264/pin')
+    assert req2.body == 'marca testing pinning'
+
+
+@responses.activate
+def test_pin_HTTPError():
+    response_json = {
+        "id": 1467264,
+        "buildTypeId": "Dummysvc_Branches_Py27",
+        "number": "141",
+        "href": "/httpAuth/app/rest/builds/id:1467264",
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:1467264'),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+    responses.add(
+        responses.PUT,
+        tc.relative_url('app/rest/builds/id:1467264/pin'),
+        status=500,
+    )
+
+    build = tc.builds.all().get(id=1467264)
+    with pytest.raises(exceptions.HTTPError):
+        build.pin('marca testing pinning')
+
+
+@responses.activate
+def test_unpin():
+    response_json = {
+        "id": 1467264,
+        "buildTypeId": "Dummysvc_Branches_Py27",
+        "number": "141",
+        "href": "/httpAuth/app/rest/builds/id:1467264",
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:1467264'),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+    responses.add(
+        responses.DELETE,
+        tc.relative_url('app/rest/builds/id:1467264/pin'),
+        status=204,
+    )
+
+    build = tc.builds.all().get(id=1467264)
+    build.unpin()
+
+    assert len(responses.calls) == 2
+    req1 = responses.calls[0].request
+    assert req1.method == 'GET'
+    assert req1.url == tc.relative_url('app/rest/builds/id:1467264')
+    req2 = responses.calls[1].request
+    assert req2.url == tc.relative_url('app/rest/builds/id:1467264/pin')
+
+
+@responses.activate
+def test_unpin_HTTPError():
+    response_json = {
+        "id": 1467264,
+        "buildTypeId": "Dummysvc_Branches_Py27",
+        "number": "141",
+        "href": "/httpAuth/app/rest/builds/id:1467264",
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:1467264'),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+    responses.add(
+        responses.DELETE,
+        tc.relative_url('app/rest/builds/id:1467264/pin'),
+        status=500,
+    )
+
+    build = tc.builds.all().get(id=1467264)
+    with pytest.raises(exceptions.HTTPError):
+        build.unpin()
 
 
 def test_unit_get_all():
