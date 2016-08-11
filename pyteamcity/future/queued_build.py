@@ -82,6 +82,24 @@ class QueuedBuild(WebBrowsable):
 
         return d
 
+    def cancel(self, comment):
+        xml = """
+            <buildCancelRequest
+               comment='{comment}'
+               readdIntoQueue='false' />
+            """.format(comment=comment)
+        url = self.teamcity.base_base_url + self.href
+        res = self.teamcity.session.post(
+            url=url,
+            headers={'Content-Type': 'application/xml',
+                     'Accept': 'application/json'},
+            data=xml)
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
+
 
 class QueuedBuildQuerySet(QuerySet):
     uri = '/app/rest/buildQueue/'
