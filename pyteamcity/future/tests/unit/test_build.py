@@ -1,8 +1,10 @@
 import datetime
 
+import responses
+
 from pyteamcity.future import TeamCity
 
-tc = TeamCity.from_environ()
+tc = TeamCity(username='user', password='password')
 
 
 def test_unit_get_all():
@@ -35,6 +37,52 @@ def test_unit_filter_by_since_build():
         count=3)
     assert '/app/rest/builds/' in builds._get_url()
     assert 'sinceBuild:(id:1421166)' in builds._get_url()
+
+
+@responses.activate
+def test_unit_filter_by_since_build_with_responses():
+    response_json = {
+        'count': 3,
+        'build': [
+            {
+                'status': 'SUCCESS',
+                'number': '510',
+                'state': 'finished',
+                'href': '/httpAuth/app/rest/builds/id:1469354',
+                'buildTypeId': 'Exportlib_Branches_Py34',
+                'id': 1469354,
+            },
+            {
+                'status': 'SUCCESS',
+                'number': '514',
+                'state': 'finished',
+                'href': '/httpAuth/app/rest/builds/id:1469353',
+                'buildTypeId': 'Exportlib_Branches_Flake8',
+                'id': 1469353,
+            },
+            {
+                'status': 'SUCCESS',
+                'number': '1012',
+                'state': 'finished',
+                'href': '/httpAuth/app/rest/builds/id:1469315',
+                'buildTypeId': 'Apptelligence_ReleaseToSjc_Deploy',
+                'id': 1469315,
+            },
+        ],
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/'),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+
+    builds = tc.builds.all().filter(
+        since_build='id:1421166',
+        count=3)
+    assert '/app/rest/builds/' in builds._get_url()
+    assert 'sinceBuild:(id:1421166)' in builds._get_url()
+    assert len(builds) == 3
 
 
 def test_unit_filter_by_user():
@@ -97,12 +145,67 @@ def test_unit_filter_by_affected_project():
     assert '?locator=affectedProject:(Dummysvc)' in builds._get_url()
 
 
+@responses.activate
 def test_unit_filter_by_build_type():
+    response_json = {
+        'id': 'DevOps_Metacloud_DeleteOldVMs',
+        'project': 'DevOps :: Metacloud',
+    }
+    uri = 'app/rest/buildTypes/id:DevOps_Metacloud_DeleteOldVMs'
+    responses.add(
+        responses.GET,
+        tc.relative_url(uri),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+    response_json = {
+        'count': 3,
+        'build': [
+            {
+                'status': 'SUCCESS',
+                'defaultBranch': True,
+                'number': '339',
+                'state': 'finished',
+                'href': '/httpAuth/app/rest/builds/id:1467764',
+                'branchName': 'master',
+                'buildTypeId': 'DevOps_Metacloud_DeleteOldVMs',
+                'id': 1467764,
+            },
+            {
+                'status': 'SUCCESS',
+                'defaultBranch': True,
+                'number': '338',
+                'state': 'finished',
+                'href': '/httpAuth/app/rest/builds/id:1464784',
+                'branchName': 'master',
+                'buildTypeId': 'DevOps_Metacloud_DeleteOldVMs',
+                'id': 1464784,
+            },
+            {
+                'status': 'SUCCESS',
+                'defaultBranch': True,
+                'number': '337',
+                'state': 'finished',
+                'href': '/httpAuth/app/rest/builds/id:1460735',
+                'branchName': 'master',
+                'buildTypeId': 'DevOps_Metacloud_DeleteOldVMs',
+                'id': 1460735,
+            },
+        ],
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/'),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
     builds = tc.builds.all().filter(
         build_type='DevOps_Metacloud_DeleteOldVMs',
         count=3)
     query_string = '?locator=buildType:DevOps_Metacloud_DeleteOldVMs'
     assert query_string in builds._get_url()
+    for build in builds:
+        assert build.build_type.id == 'DevOps_Metacloud_DeleteOldVMs'
 
 
 def test_unit_filter_by_number():
@@ -187,3 +290,45 @@ def test_unit_get_by_build_type_and_number():
         number='332',
         just_url=True)
     assert '/buildType:DevOps_Metacloud_DeleteOldVMs,number:332' in url
+
+
+@responses.activate
+def test_parameters_dict_with_responses():
+    response_json = {
+        'id': 1467264,
+        'buildTypeId': 'Dummysvc_Branches_Py27',
+        'number': '141',
+        'href': '/httpAuth/app/rest/builds/id:1467264',
+        'properties': {
+            'count': 1,
+            'property': [
+                {
+                    'name': 'env.PYTHONWARNINGS',
+                    'value': 'ignore',
+                },
+            ],
+        },
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:1467264'),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+
+    build = tc.builds.all().get(id=1467264)
+    assert build.parameters_dict['env.PYTHONWARNINGS'].value == 'ignore'
+
+
+@responses.activate
+def test_api_url_with_responses():
+    response_json = {'id': 1467264}
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:1467264'),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+
+    build = tc.builds.all().get(id=1467264)
+    assert build.api_url.endswith('app/rest/builds/id:1467264')

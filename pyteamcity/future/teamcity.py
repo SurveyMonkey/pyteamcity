@@ -76,6 +76,9 @@ class TeamCity(object):
             self.base_url = self.base_base_url + '/guestAuth'
             self.auth = None
 
+    def relative_url(self, uri):
+        return '%s/%s' % (self.base_url, uri)
+
     @classmethod
     def from_environ(cls):
         return TeamCity(
