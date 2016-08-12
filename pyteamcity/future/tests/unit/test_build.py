@@ -408,6 +408,11 @@ def test_unit_get_by_build_type_and_number():
 
 @responses.activate
 def test_parameters_dict_with_responses():
+    expected_raw_value = "".join([
+        "password ",
+        "display='hidden' ",
+        "label='ansible_vault_password'",
+    ])
     response_json = {
         'id': 1467264,
         'buildTypeId': 'Dummysvc_Branches_Py27',
@@ -419,6 +424,12 @@ def test_parameters_dict_with_responses():
                 {
                     'name': 'env.PYTHONWARNINGS',
                     'value': 'ignore',
+                },
+                {
+                    'type': {
+                        'rawValue': expected_raw_value,
+                    },
+                    'name': 'env.ANSIBLE_VAULT_PASSWORD',
                 },
             ],
         },
@@ -432,6 +443,8 @@ def test_parameters_dict_with_responses():
 
     build = tc.builds.all().get(id=1467264)
     assert build.parameters_dict['env.PYTHONWARNINGS'].value == 'ignore'
+    param = build.parameters_dict['env.ANSIBLE_VAULT_PASSWORD']
+    assert param.ptype['rawValue'] == expected_raw_value
 
 
 @responses.activate
@@ -446,3 +459,122 @@ def test_api_url_with_responses():
 
     build = tc.builds.all().get(id=1467264)
     assert build.api_url.endswith('app/rest/builds/id:1467264')
+
+
+@responses.activate
+def test_repr_with_responses():
+    build_id = 1467264
+    response_json = {
+        'id': build_id,
+        'buildTypeId': 'Dummysvc_Branches_Py27',
+        'number': '141',
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:%d' % build_id),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+
+    build = tc.builds.all().get(id=build_id)
+    assert 'id=1467264' in repr(build)
+    assert 'Dummysvc_Branches_Py27' in repr(build)
+    assert '141' in repr(build)
+
+
+@responses.activate
+def test_user_with_responses():
+    build_id = 1467264
+    response_json = {
+        'id': build_id,
+        'triggered': {
+            'date': '20160810T172739-0700',
+            'type': 'user',
+            'user': {
+                'username': 'marca',
+                'href': '/httpAuth/app/rest/users/id:16',
+                'name': 'Marc Abramowitz',
+                'id': 16,
+            },
+        },
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:%d' % build_id),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+
+    build = tc.builds.all().get(id=build_id)
+    assert build.user.username == 'marca'
+    assert build.user.id == 16
+
+
+@responses.activate
+def test_agent_with_responses():
+    build_id = 1467264
+    response_json = {
+        'id': build_id,
+        'agent': {
+            'typeId': 57,
+            'href': '/httpAuth/app/rest/agents/id:57',
+            'id': 57,
+            'name': 'tcagent111',
+        },
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:%d' % build_id),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+
+    build = tc.builds.all().get(id=build_id)
+    assert build.agent.name == 'tcagent111'
+    assert build.agent.id == 57
+
+
+@responses.activate
+def test_dates_with_responses():
+    build_id = 1467264
+    queued_date_string = '20160810T172739-0700'
+    start_date_string = '20160810T172741-0700'
+    finish_date_string = '20160810T172802-0700'
+    response_json = {
+        'id': build_id,
+        'queuedDate': queued_date_string,
+        'startDate': start_date_string,
+        'finishDate': finish_date_string,
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:1467264'),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+
+    build = tc.builds.all().get(id=build_id)
+    assert isinstance(build.queued_date, datetime.datetime)
+    assert build.queued_date_string == queued_date_string
+    assert build.queued_date.year == 2016
+    assert build.queued_date.month == 8
+    assert build.queued_date.day == 10
+    assert build.queued_date.hour == 17
+    assert build.queued_date.minute == 27
+    assert build.queued_date.second == 39
+    assert isinstance(build.start_date, datetime.datetime)
+    assert build.start_date_string == start_date_string
+    assert build.start_date.year == 2016
+    assert build.start_date.month == 8
+    assert build.start_date.day == 10
+    assert build.start_date.hour == 17
+    assert build.start_date.minute == 27
+    assert build.start_date.second == 41
+    assert isinstance(build.finish_date, datetime.datetime)
+    assert build.finish_date_string == finish_date_string
+    assert build.finish_date.year == 2016
+    assert build.finish_date.month == 8
+    assert build.finish_date.day == 10
+    assert build.finish_date.hour == 17
+    assert build.finish_date.minute == 28
+    assert build.finish_date.second == 2
