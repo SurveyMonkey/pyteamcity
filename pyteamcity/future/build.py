@@ -1,5 +1,6 @@
 from six.moves.urllib.parse import quote
 
+from . import exceptions
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
 from .core.utils import parse_date_string
@@ -15,7 +16,7 @@ class Build(object):
                  build_type_id,
                  queued_date_string, start_date_string, finish_date_string,
                  state, status, branch_name, href,
-                 build_query_set, data_dict=None):
+                 build_query_set, teamcity, data_dict=None):
         self.id = id
         self.number = number
         self.queued_date_string = queued_date_string
@@ -27,6 +28,9 @@ class Build(object):
         self.branch_name = branch_name
         self.href = href
         self.build_query_set = build_query_set
+        self.teamcity = teamcity
+        if self.teamcity is None and self.build_query_set is not None:
+            self.teamcity = self.build_query_set.teamcity
         self._data_dict = data_dict
 
     @property
@@ -70,7 +74,7 @@ class Build(object):
             self.number)
 
     @classmethod
-    def from_dict(cls, d, build_query_set):
+    def from_dict(cls, d, build_query_set=None, teamcity=None):
         return Build(
             id=d.get('id'),
             number=d.get('number'),
@@ -83,6 +87,7 @@ class Build(object):
             branch_name=d.get('branchName'),
             href=d.get('href'),
             build_query_set=build_query_set,
+            teamcity=teamcity,
             data_dict=d)
 
     @property
@@ -109,6 +114,26 @@ class Build(object):
     @property
     def artifacts(self):
         return Artifact(build=self)
+
+    def pin(self, comment):
+        url = self.teamcity.base_base_url + self.href + '/pin'
+        res = self.teamcity.session.put(url=url, data=comment)
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
+        return self
+
+    def unpin(self):
+        url = self.teamcity.base_base_url + self.href + '/pin'
+        res = self.teamcity.session.delete(url=url)
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
+        return self
 
 
 class BuildQuerySet(QuerySet):
@@ -181,5 +206,5 @@ class BuildQuerySet(QuerySet):
         return since_date
 
     def __iter__(self):
-        return (Build.from_dict(d, self)
+        return (Build.from_dict(d, self, teamcity=self.teamcity)
                 for d in self._data()['build'])
