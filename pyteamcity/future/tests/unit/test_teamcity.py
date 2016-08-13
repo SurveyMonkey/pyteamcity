@@ -1,8 +1,9 @@
 import datetime
 
+import pytest
 import responses
 
-from pyteamcity.future import TeamCity
+from pyteamcity.future import exceptions, TeamCity
 
 
 def test_username_and_password():
@@ -76,3 +77,16 @@ def test_unit_server_info_with_responses():
     assert server_info.build_date.year == 2015
     assert server_info.build_date.month == 9
     assert server_info.build_date.day == 18
+
+
+@responses.activate
+def test_unit_server_info_exception_with_responses():
+    tc = TeamCity()
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/server'),
+        status=500,
+    )
+
+    with pytest.raises(exceptions.HTTPError):
+        tc.server_info
