@@ -252,8 +252,8 @@ def test_get_builds_mock_send_simulate_error():
         mock_send.return_value._content = expected_data.encode('utf-8')
         with pytest.raises(HTTPError) as excinfo:
             tc.get_builds()
-            assert excinfo.value.status_code == 500
-            assert excinfo.value.message == expected_data
+        assert excinfo.value.status_code == 500
+        assert excinfo.value.message == expected_data
 
 
 def test_get_builds_no_args():
