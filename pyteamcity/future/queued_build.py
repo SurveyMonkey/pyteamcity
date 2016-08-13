@@ -138,7 +138,7 @@ class QueuedBuildQuerySet(QuerySet):
         """
         Trigger a new build
         """
-        url = self.teamcity.base_base_url + self.uri
+        url = self.teamcity.base_url + self.uri
         data = self._get_build_node(
             build_type_id, branch,
             comment, parameters, agent_id)
