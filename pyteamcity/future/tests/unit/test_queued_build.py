@@ -1,8 +1,9 @@
 import datetime
 
+import pytest
 import responses
 
-from pyteamcity.future import TeamCity
+from pyteamcity.future import exceptions, TeamCity
 
 tc = TeamCity()
 
@@ -67,7 +68,7 @@ def test_unit_queued_build_with_responses():
                 "id": 1455869,
                 "buildTypeId": "Scansvc_PullRequests_Py27",
                 "state": "queued",
-                "branchName": "1/merge",
+                "branchName": "master",
                 "href": "/httpAuth/app/rest/buildQueue/id:1455869",
                 "webUrl": "https://tcserver/viewQueued.html?itemId=1455869",
             },
@@ -75,7 +76,7 @@ def test_unit_queued_build_with_responses():
                 "id": 1471658,
                 "buildTypeId": "Responseweb_2_Branches_Package",
                 "state": "queued",
-                "branchName": "preview",
+                "branchName": "master",
                 "href": "/httpAuth/app/rest/buildQueue/id:1471658",
                 "webUrl": "https://tcserver/viewQueued.html?itemId=1471658",
             },
@@ -94,7 +95,12 @@ def test_unit_queued_build_with_responses():
         content_type='application/json',
     )
 
-    queued_builds = tc.queued_builds.all()
+    queued_builds = tc.queued_builds.all().filter(
+        branch='master',
+        user='marca',
+        start=2,
+        lookup_limit=2,
+    )
     assert len(queued_builds) == 2
     for queued_build in queued_builds:
         assert hasattr(queued_build, 'build_type_id')
@@ -113,3 +119,116 @@ def test_unit_queued_build_with_responses():
     assert queued_build.queued_date.second == 12
     assert queued_build.build_type.id == 'Responseweb_2_Branches_Package'
     assert queued_build.build_type.name == 'package'
+
+
+@responses.activate
+def test_trigger_build_with_responses():
+    expected_raw_value = "".join([
+        "password ",
+        "display='hidden' ",
+        "label='ansible_vault_password'",
+    ])
+    response_json = {
+        "id": 1473600,
+        "buildTypeId": "Dummysvc_Branches_Py27",
+        "state": "queued",
+        "branchName": "<default>",
+        "defaultBranch": True,
+        "href": "/app/rest/buildQueue/id:1473600",
+        "webUrl": "https://tcserver/viewQueued.html?itemId=1473600",
+        "buildType": {
+            "id": "Dummysvc_Branches_Py27",
+            "name": "py27",
+            "projectName": "dummysvc :: branches",
+            "projectId": "Dummysvc_Branches",
+            "href": "/app/rest/buildTypes/id:Dummysvc_Branches_Py27",
+            "webUrl": "https://tcserver/viewType.html"
+                      "?buildTypeId=Dummysvc_Branches_Py27",
+        },
+        "waitReason": "Waiting to start checking for changes",
+        "queuedDate": "20160812T154256-0700",
+        "triggered": {
+            "type": "user",
+            "date": "20160812T154256-0700",
+            "user": {
+                "username": "marca",
+                "name": "Marc Abramowitz",
+                "id": 16,
+                "href": "/app/rest/users/id:16",
+            },
+        },
+        "properties": {
+            "count": 2,
+            "property": [
+                {
+                    "name": "env.PIP_USE_WHEEL",
+                    "value": "true",
+                },
+                {
+                    "name": "env.PIP_WHEEL_DIR",
+                    "value": "/tmp/wheelhouse",
+                },
+                {
+                    'name': 'env.ANSIBLE_VAULT_PASSWORD',
+                    'type': {'rawValue': expected_raw_value},
+                },
+            ],
+        }
+    }
+
+    responses.add(
+        responses.POST,
+        tc.relative_url('app/rest/buildQueue/'),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+
+    queued_build = tc.queued_builds.all().trigger_build(
+        build_type_id='Dummysvc_Branches_Py27',
+        branch='master',
+        agent_id=70,
+        comment='just testing',
+        parameters={'env.PIP_USE_WHEEL': 'true',
+                    'env.PIP_WHEEL_DIR': '/tmp/wheelhouse'},
+    )
+    assert isinstance(queued_build.id, int)
+    assert 'viewQueued.html' in queued_build.web_url
+    assert queued_build.user.username == 'marca'
+    assert isinstance(queued_build.queued_date, datetime.datetime)
+    assert queued_build.build_type_id == 'Dummysvc_Branches_Py27'
+    assert queued_build.build_type.name == 'py27'
+    assert queued_build.build_type.id == 'Dummysvc_Branches_Py27'
+    assert queued_build.branch_name == '<default>'
+    params = queued_build.parameters_dict
+    assert params['env.PIP_USE_WHEEL'].value == 'true'
+    assert params['env.PIP_WHEEL_DIR'].value == '/tmp/wheelhouse'
+
+    # Test case where build node has no build_attributes
+    queued_build = tc.queued_builds.all().trigger_build(
+        build_type_id='Dummysvc_Branches_Py27',
+    )
+    assert isinstance(queued_build.id, int)
+    assert 'viewQueued.html' in queued_build.web_url
+    assert queued_build.user.username == 'marca'
+    assert isinstance(queued_build.queued_date, datetime.datetime)
+    assert queued_build.build_type_id == 'Dummysvc_Branches_Py27'
+    assert queued_build.build_type.name == 'py27'
+    assert queued_build.build_type.id == 'Dummysvc_Branches_Py27'
+    assert queued_build.branch_name == '<default>'
+    params = queued_build.parameters_dict
+    assert params['env.PIP_USE_WHEEL'].value == 'true'
+    assert params['env.PIP_WHEEL_DIR'].value == '/tmp/wheelhouse'
+
+
+@responses.activate
+def test_trigger_build_exception_with_responses():
+    responses.add(
+        responses.POST,
+        tc.relative_url('app/rest/buildQueue/'),
+        status=500,
+    )
+
+    with pytest.raises(exceptions.HTTPError):
+        tc.queued_builds.all().trigger_build(
+            build_type_id='Dummysvc_Branches_Py27',
+        )
