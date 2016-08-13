@@ -4,7 +4,7 @@ from .core.queryset import QuerySet
 from .core.utils import parse_date_string
 from .core.web_browsable import WebBrowsable
 
-from .build_type import BuildType, BuildTypeQuerySet
+from .build_type import BuildType
 from .user import User
 
 
@@ -42,9 +42,6 @@ class QueuedBuild(WebBrowsable):
             build_type = BuildType.from_dict(
                 self._data_dict.get('buildType'),
                 teamcity=teamcity)
-        elif 'buildTypeId' in self._data_dict:
-            build_type_id = self._data_dict['buildTypeId']
-            build_type = BuildTypeQuerySet(teamcity).get(id=build_type_id)
 
         return build_type
 
