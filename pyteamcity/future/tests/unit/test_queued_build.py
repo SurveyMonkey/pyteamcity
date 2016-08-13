@@ -176,11 +176,18 @@ def test_trigger_build_with_responses():
         }
     }
 
+    # Response to triggering a build
     responses.add(
         responses.POST,
         tc.relative_url('app/rest/buildQueue/'),
         json=response_json, status=200,
         content_type='application/json',
+    )
+    # Response to canceling a build
+    responses.add(
+        responses.POST,
+        tc.relative_url('app/rest/buildQueue/id:1473600'),
+        status=500,
     )
 
     queued_build = tc.queued_builds.all().trigger_build(
@@ -198,10 +205,13 @@ def test_trigger_build_with_responses():
     assert queued_build.build_type_id == 'Dummysvc_Branches_Py27'
     assert queued_build.build_type.name == 'py27'
     assert queued_build.build_type.id == 'Dummysvc_Branches_Py27'
-    assert queued_build.branch_name == '<default>'
     params = queued_build.parameters_dict
     assert params['env.PIP_USE_WHEEL'].value == 'true'
     assert params['env.PIP_WHEEL_DIR'].value == '/tmp/wheelhouse'
+
+    # Now test canceling the build
+    with pytest.raises(exceptions.HTTPError):
+        queued_build.cancel(comment='This is a test')
 
     # Test case where build node has no build_attributes
     queued_build = tc.queued_builds.all().trigger_build(
@@ -218,6 +228,10 @@ def test_trigger_build_with_responses():
     params = queued_build.parameters_dict
     assert params['env.PIP_USE_WHEEL'].value == 'true'
     assert params['env.PIP_WHEEL_DIR'].value == '/tmp/wheelhouse'
+
+    # Now test canceling the build
+    with pytest.raises(exceptions.HTTPError):
+        queued_build.cancel(comment='This is a test')
 
 
 @responses.activate

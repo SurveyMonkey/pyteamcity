@@ -85,7 +85,7 @@ class QueuedBuild(WebBrowsable):
                comment='{comment}'
                readdIntoQueue='false' />
             """.format(comment=comment)
-        url = self.teamcity.base_base_url + self.href
+        url = self.teamcity.base_url + self.href
         res = self.teamcity.session.post(
             url=url,
             headers={'Content-Type': 'application/xml',
