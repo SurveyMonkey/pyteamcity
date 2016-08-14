@@ -83,7 +83,6 @@ class Project(WebBrowsable):
                 status_code=res.status_code,
                 reason=res.reason,
                 text=res.text)
-        return url
 
     def create_build_type(self, name):
         """
