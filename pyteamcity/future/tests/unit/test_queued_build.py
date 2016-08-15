@@ -95,6 +95,15 @@ def test_unit_queued_build_with_responses():
         content_type='application/json',
     )
 
+    with pytest.raises(exceptions.MultipleObjectsReturned):
+        tc.queued_builds.all().get(
+            branch='master',
+            user='marca',
+            start=2,
+            lookup_limit=2,
+            raise_multiple_objects_returned=True,
+        )
+
     queued_builds = tc.queued_builds.all().filter(
         branch='master',
         user='marca',
