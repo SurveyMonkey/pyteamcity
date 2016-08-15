@@ -29,7 +29,7 @@ class HTTPError(Error):
         self.text = text
 
     def __str__(self):
-        return self.reason
+        return self.reason or self.text
 
 
 class UnauthorizedError(HTTPError):
