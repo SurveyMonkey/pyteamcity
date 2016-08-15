@@ -1,3 +1,5 @@
+import webbrowser
+
 import pytest
 import responses
 
@@ -77,7 +79,7 @@ def test_unit_create_project_with_responses():
 
 
 @responses.activate
-def test_unit_filter_by_id_with_responses():
+def test_unit_filter_by_id_with_responses(monkeypatch):
     response_json = {
         "count": 1,
         "href": "/httpAuth/app/rest/projects/?locator=id:Txtasvc_Branches",
@@ -103,6 +105,8 @@ def test_unit_filter_by_id_with_responses():
     for project in projects:
         assert project.id == 'Txtasvc_Branches'
         assert 'Txtasvc_Branches' in repr(project)
+        monkeypatch.setattr(webbrowser, 'open', lambda url: url)
+        project.open_web_browser()
 
 
 @responses.activate
