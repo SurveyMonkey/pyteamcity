@@ -43,11 +43,13 @@ class QuerySet(object):
         except requests.HTTPError as e:
             status_code = e.response.status_code
             if status_code == 401:
-                raise exceptions.UnauthorizedError(
-                    status_code=status_code,
-                    msg=str(e),
-                    text=e.response.text)
-            raise
+                exception_class = exceptions.UnauthorizedError
+            else:
+                exception_class = exceptions.HTTPError
+            raise exception_class(
+                status_code=status_code,
+                reason=str(e),
+                text=e.response.text)
 
         if res.headers.get('Content-Type') == 'application/json':
             data = res.json()
@@ -91,6 +93,6 @@ class QuerySet(object):
     def __getitem__(self, index):
         try:
             return next(itertools.islice(self, index, index + 1))
-        except TypeError:
+        except TypeError:  # pragma: no cover
             return list(itertools.islice(
                 self, index.start, index.stop, index.step))

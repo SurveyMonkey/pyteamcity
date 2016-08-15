@@ -79,6 +79,30 @@ def test_unit_create_project_with_responses():
 
 
 @responses.activate
+def test_unit_fetch_401_failure_with_responses():
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/projects/'),
+        status=401,
+    )
+    projects = tc.projects.all().filter(id='Txtasvc_Branches')
+    with pytest.raises(exceptions.UnauthorizedError):
+        assert len(projects) == 1
+
+
+@responses.activate
+def test_unit_fetch_500_failure_with_responses():
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/projects/'),
+        status=500,
+    )
+    projects = tc.projects.all().filter(id='Txtasvc_Branches')
+    with pytest.raises(exceptions.HTTPError):
+        assert len(projects) == 1
+
+
+@responses.activate
 def test_unit_filter_by_id_with_responses(monkeypatch):
     response_json = {
         "count": 1,
@@ -254,6 +278,9 @@ def test_unit_subprojects():
     assert project.id == 'Txtasvc'
     assert project.name == 'txtasvc'
     assert len(project.projects) == 8
+    assert project.projects[4].id == 'Txtasvc_ReleaseToMt3'
+    for p in project.projects:
+        assert p.parent_project.id == 'Txtasvc'
 
 
 @responses.activate
