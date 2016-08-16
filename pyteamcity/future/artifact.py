@@ -82,10 +82,14 @@ class Artifact(object):
         return res.content
 
     def get_artifact_by_path(self, path):
-        return Artifact(build=self.build, path=self.path + '/' + path)
+        return Artifact(build=self.build,
+                        path=os.path.join(self.path, path))
 
     def __div__(self, path):
         return self.get_artifact_by_path(path)
+
+    # Python 3
+    __truediv__ = __div__
 
     def listdir(self, pattern=None):
         teamcity = self.build.build_query_set.teamcity
@@ -97,8 +101,6 @@ class Artifact(object):
                 reason=res.reason,
                 text=res.text)
         data = res.json()
-        if data.get('count', 0) == 0 or 'file' not in data:
-            return []
         ret = []
         for f in data['file']:
             if pattern is None or fnmatch.fnmatch(f['name'], pattern):
