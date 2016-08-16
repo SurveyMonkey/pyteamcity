@@ -105,7 +105,6 @@ class BuildType(object):
                 status_code=res.status_code,
                 reason=res.reason,
                 text=res.text)
-        return url
 
 
 class BuildTypeQuerySet(QuerySet):
