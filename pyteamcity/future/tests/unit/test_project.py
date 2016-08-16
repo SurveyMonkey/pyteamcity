@@ -213,6 +213,8 @@ def test_unit_get_by_id_with_responses():
     assert project.parent_project.id == 'Txtasvc'
     params = project.parameters_dict
     assert params['env.PIP_USE_WHEEL'].value == 'true'
+    assert 'Parameter' in repr(params['env.PIP_USE_WHEEL'])
+    assert 'ptype=None' in repr(params['env.PIP_USE_WHEEL'])
     assert params['env.PIP_WHEEL_DIR'].value == '/tmp/wheelhouse'
 
 
