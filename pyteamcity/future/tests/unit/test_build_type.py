@@ -74,7 +74,7 @@ def _get_build_type_json():
             "parentProjectId": "Txtasvc",
         },
         "parameters": {
-            "count": 2,
+            "count": 3,
             "property": [
                 {
                     "name": "env.PIP_USE_WHEEL",
