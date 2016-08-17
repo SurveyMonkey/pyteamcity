@@ -143,14 +143,15 @@ def test_trigger_build_with_responses():
         "state": "queued",
         "branchName": "<default>",
         "defaultBranch": True,
-        "href": "/app/rest/buildQueue/id:1473600",
+        "href": "/guestAuth/app/rest/buildQueue/id:1473600",
         "webUrl": "https://tcserver/viewQueued.html?itemId=1473600",
         "buildType": {
             "id": "Dummysvc_Branches_Py27",
             "name": "py27",
             "projectName": "dummysvc :: branches",
             "projectId": "Dummysvc_Branches",
-            "href": "/app/rest/buildTypes/id:Dummysvc_Branches_Py27",
+            "href": "/guestAuth/app/rest/buildTypes"
+                    "/id:Dummysvc_Branches_Py27",
             "webUrl": "https://tcserver/viewType.html"
                       "?buildTypeId=Dummysvc_Branches_Py27",
         },
@@ -163,7 +164,7 @@ def test_trigger_build_with_responses():
                 "username": "marca",
                 "name": "Marc Abramowitz",
                 "id": 16,
-                "href": "/app/rest/users/id:16",
+                "href": "/guestAuth/app/rest/users/id:16",
             },
         },
         "properties": {
