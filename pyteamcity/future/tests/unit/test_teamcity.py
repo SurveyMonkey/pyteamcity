@@ -22,6 +22,18 @@ def test_non_standard_https_port():
     assert tc.base_url == 'https://127.0.0.1:8000/guestAuth'
 
 
+def test_from_environ(monkeypatch):
+    monkeypatch.setenv('TEAMCITY_PROTO', 'https')
+    monkeypatch.setenv('TEAMCITY_HOST', 'tcserver123')
+    monkeypatch.setenv('TEAMCITY_USER', 'user123')
+    monkeypatch.setenv('TEAMCITY_PASSWORD', 'password')
+    tc = TeamCity.from_environ()
+    assert tc.protocol == 'https'
+    assert tc.server == 'tcserver123'
+    assert tc.username == 'user123'
+    assert tc.password == 'password'
+
+
 @responses.activate
 def test_unit_server_info_with_responses():
     tc = TeamCity()

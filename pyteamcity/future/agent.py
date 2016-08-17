@@ -3,7 +3,7 @@ import requests
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
 
-from .agent_pool import AgentPool, AgentPoolQuerySet
+from .agent_pool import AgentPoolQuerySet
 
 
 class Agent(object):
@@ -55,10 +55,7 @@ class Agent(object):
     @property
     def pool(self):
         teamcity = self.query_set.teamcity
-        if 'agentPool' in self._data_dict:
-            agent_pool = AgentPool.from_dict(self._data_dict.get('pool'))
-        else:
-            agent_pool = AgentPoolQuerySet(teamcity).get(id=self.pool_id)
+        agent_pool = AgentPoolQuerySet(teamcity).get(id=self.pool_id)
         return agent_pool
 
     @property
@@ -69,8 +66,6 @@ class Agent(object):
             param_obj = Parameter()
             if 'value' in param:
                 param_obj.value = param['value']
-            if 'type' in param:
-                param_obj.ptype = param['type']
             d[param['name']] = param_obj
 
         return d
