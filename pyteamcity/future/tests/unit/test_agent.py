@@ -1,7 +1,9 @@
+import responses
+
 from pyteamcity.future import TeamCity
 from pyteamcity.future.agent import Agent, AgentQuerySet
 
-tc = TeamCity.from_environ()
+tc = TeamCity()
 
 
 def get_agent_quick(id):
@@ -17,6 +19,82 @@ def test_unit_get_all():
 def test_unit_get_by_id():
     url = tc.agents.all().get(id=34, just_url=True)
     assert url.endswith('/agents/id:34')
+
+
+@responses.activate
+def test_unit_get_all_with_responses():
+    agents_json = {
+        "count": 6,
+        "href": "/httpAuth/app/rest/agents/",
+        "agent": [
+            {"id": 69, "name": "tcagent101"},
+            {"id": 67, "name": "tcagent102"},
+            {"id": 70, "name": "tcagent103"},
+            {"id": 34, "name": "tcagent112"},
+            {"id": 32, "name": "tcagent113"},
+            {"id": 33, "name": "tcagent114"},
+        ],
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/agents/'),
+        json=agents_json, status=200,
+        content_type='application/json',
+    )
+    agents = tc.agents.all()
+    assert len(agents) == 6
+    for agent in agents:
+        assert hasattr(agent, 'name')
+
+
+@responses.activate
+def test_unit_get_by_id_with_responses():
+    agent_pools_json = {
+        "id": 0,
+        "name": "Default",
+        "href": "/httpAuth/app/rest/agentPools/id:0",
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/agentPools/id:0'),
+        json=agent_pools_json, status=200,
+        content_type='application/json',
+    )
+    agent_json = {
+        'id': 34,
+        'name': 'tcagent112',
+        'pool': {'id': 0, 'name': 'Default'},
+        "properties": {
+            "count": 2,
+            "property": [
+                {'name': 'env.TEAMCITY_GIT_PATH', 'value': '/usr/bin/git'},
+                {'name': 'env.TERM', 'value': 'linux'},
+            ],
+        },
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/agents/id:34'),
+        json=agent_json, status=200,
+        content_type='application/json',
+    )
+    responses.add(
+        responses.PUT,
+        tc.relative_url('app/rest/agents/id:34/enabled'),
+        body='true', status=200,
+        content_type='text/plain',
+    )
+    agent = tc.agents.all().get(id=34)
+    assert agent.id == 34
+    assert agent.name == 'tcagent112'
+    assert agent.pool.name == 'Default'
+    assert 'tcagent112' in repr(agent)
+    params = agent.parameters_dict
+    assert params['env.TEAMCITY_GIT_PATH'].value == '/usr/bin/git'
+    assert params['env.TERM'].value == 'linux'
+
+    # Enable agent
+    agent.enable()
 
 
 def test_unit_disable_enable():
