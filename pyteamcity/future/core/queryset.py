@@ -51,11 +51,7 @@ class QuerySet(object):
                 reason=str(e),
                 text=e.response.text)
 
-        if res.headers.get('Content-Type') == 'application/json':
-            data = res.json()
-        else:
-            data = res.text
-
+        data = res.json()
         return data
 
     def _data(self, details=False, href=None):
