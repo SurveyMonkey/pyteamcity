@@ -7,7 +7,7 @@ from .core.utils import parse_date_string
 
 from .agent import Agent
 from .artifact import Artifact
-from .build_type import BuildType, BuildTypeQuerySet
+from .build_type import BuildTypeQuerySet
 from .user import User
 
 
@@ -57,11 +57,8 @@ class Build(object):
     @property
     def build_type(self):
         teamcity = self.build_query_set.teamcity
-        if 'buildType' in self._data_dict:
-            build_type = BuildType.from_dict(self._data_dict.get('buildType'))
-        elif 'buildTypeId' in self._data_dict:
-            build_type_id = self._data_dict['buildTypeId']
-            build_type = BuildTypeQuerySet(teamcity).get(id=build_type_id)
+        build_type_id = self._data_dict['buildTypeId']
+        build_type = BuildTypeQuerySet(teamcity).get(id=build_type_id)
 
         return build_type
 
