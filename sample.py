@@ -37,7 +37,7 @@ print(json.dumps(data, indent=4))
 # data = tc.get_build_by_build_id(73450)
 # print(json.dumps(data, indent=4))
 
-# data = tc.get_all_projects()
+# data = tc.get_projects()
 # print(json.dumps(data, indent=4))
 
 # data = tc.get_agents()

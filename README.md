@@ -57,7 +57,7 @@ tc = TeamCity()
 ### Getting data
 
 ```python
-tc.get_all_projects()
+tc.get_projects()
 tc.get_project_by_project_id('MyProject')
 tc.get_all_users()
 tc.get_user_by_username('codyw')
