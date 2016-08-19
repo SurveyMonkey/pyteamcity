@@ -21,6 +21,8 @@ setup(
     description='Use the TeamCity REST API from Python',
     long_description='%s\n\n%s' % (README, CHANGES),
     url='https://github.com/SurveyMonkey/pyteamcity',
+    maintainer='Marc Abramowitz',
+    maintainer_email='marc@marc-abramowitz.com',
     author='Yotam Oron',
     author_email='yotamoron@yahoo.com',
     py_modules=['pyteamcity'],
