@@ -1,7 +1,8 @@
 # PyTeamCity
 
 [![Latest Version](https://badge.fury.io/py/pyteamcity.svg)](https://pypi.python.org/pypi/pyteamcity/)
-[![Build Status](https://travis-ci.org/SurveyMonkey/pyteamcity.svg?branch=master)](https://travis-ci.org/SurveyMonkey/pyteamcity)
+[![Travis CI Build Status](https://travis-ci.org/SurveyMonkey/pyteamcity.svg?branch=master)](https://travis-ci.org/SurveyMonkey/pyteamcity)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true)
 
 Python interface to the [REST
 API](https://confluence.jetbrains.com/display/TCD9/REST+API) of
