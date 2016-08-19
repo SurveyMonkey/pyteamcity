@@ -102,3 +102,58 @@ def test_unit_server_info_exception_with_responses():
 
     with pytest.raises(exceptions.HTTPError):
         tc.server_info
+
+
+@responses.activate
+def test_unit_plugins_with_responses():
+    tc = TeamCity()
+    response_json = {
+        'count': 97,
+        'plugin': [
+            {
+                'version': '37176',
+                'displayName': 'Agent System Info',
+                'name': 'agent-system-info',
+            },
+            {
+                'version': '37176',
+                'displayName': 'Install Agent on remote host (agent push)',
+                'name': 'agent.push',
+            },
+            {
+                'version': '1.0.1',
+                'displayName': 'Ansible Runner',
+                'name': 'ansible-runner',
+            },
+        ],
+    }
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/server/plugins'),
+        json=response_json, status=200,
+        content_type='application/json',
+    )
+
+    plugins = tc.plugins()
+    assert plugins[0].name == 'agent-system-info'
+    assert plugins[0].version == '37176'
+    assert 'agent-system-info' in repr(plugins[0])
+    assert plugins[1].name == 'agent.push'
+    assert plugins[1].version == '37176'
+    assert 'agent.push' in repr(plugins[1])
+    assert plugins[2].name == 'ansible-runner'
+    assert plugins[2].version == '1.0.1'
+    assert 'ansible-runner' in repr(plugins[2])
+
+
+@responses.activate
+def test_unit_plugins_error():
+    tc = TeamCity()
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/server/plugins'),
+        status=500,
+    )
+
+    with pytest.raises(exceptions.HTTPError):
+        tc.plugins()

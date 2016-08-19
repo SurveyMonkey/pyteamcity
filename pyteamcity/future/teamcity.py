@@ -18,6 +18,23 @@ from .user_group import UserGroupQuerySet
 from .vcs_root import VCSRootQuerySet
 
 
+class Plugin(object):
+    def __init__(self, name, display_name, version, load_path):
+        self.name = name
+        self.display_name = display_name
+        self.version = version
+        self.load_path = load_path
+
+    def __repr__(self):
+        return '<%s.%s: name=%r display_name=%r version=%r>' % (
+            self.__module__,
+            self.__class__.__name__,
+            self.name,
+            self.display_name,
+            self.version,
+        )
+
+
 class TeamCity(object):
     username = None
     password = None
@@ -94,6 +111,25 @@ class TeamCity(object):
             username=os.environ.get('TEAMCITY_USER'),
             password=os.environ.get('TEAMCITY_PASSWORD'),
             server=os.environ.get('TEAMCITY_HOST'))
+
+    def plugins(self):
+        url = self.base_url + '/app/rest/server/plugins'
+        res = self.session.get(url)
+        if not res.ok:
+            raise exceptions.HTTPError(
+                status_code=res.status_code,
+                reason=res.reason,
+                text=res.text)
+        data = res.json()
+        plugins = []
+        for plugin in data['plugin']:
+            plugins.append(
+                Plugin(name=plugin.get('name'),
+                       display_name=plugin.get('displayName'),
+                       version=plugin.get('version'),
+                       load_path=plugin.get('loadPath'))
+            )
+        return plugins
 
     @property
     def server_info(self):
