@@ -7,8 +7,8 @@ tc = TeamCity()
 # data = tc.get_all_users()
 # print(json.dumps(data, indent=4))
 
-data = tc.get_user_by_username('codyw')
-print(json.dumps(data, indent=4))
+# data = tc.get_user_by_username('codyw')
+# print(json.dumps(data, indent=4))
 
 # data = tc.get_all_vcs_roots()
 # print(json.dumps(data, indent=4))
@@ -37,8 +37,8 @@ print(json.dumps(data, indent=4))
 # data = tc.get_build_by_build_id(73450)
 # print(json.dumps(data, indent=4))
 
-# data = tc.get_projects()
-# print(json.dumps(data, indent=4))
+data = tc.get_projects()
+print(json.dumps(data, indent=4))
 
 # data = tc.get_agents()
 # print(json.dumps(data, indent=4))
