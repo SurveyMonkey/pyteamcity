@@ -8,10 +8,13 @@ env:
   - TOXENV=pypy
   - TOXENV=flake8
 install:
+  - travis_retry pip install python-coveralls
   - travis_retry pip install tox
 script:
   - tox
 
+after_success:
+  - coveralls
 after_script:
   - |
       env | sort
