@@ -29,6 +29,10 @@ has an API with a smaller number of methods that are more consistent and
 more flexible in terms of filtering. It is modeled after the Django ORM
 API.
 
+There's no formal docs for this API yet, but you should be able to
+figure out how to use it by looking at the [unit
+tests](https://github.com/SurveyMonkey/pyteamcity/tree/master/pyteamcity/future/tests/unit).
+
 I am probably not going to merge PRs that add things to the old API,
 because I see the new API as the future. I of course am very interested
 in PRs that add things to the new API!
