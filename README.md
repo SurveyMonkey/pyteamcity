@@ -17,7 +17,10 @@ pip install pyteamcity
 
 ## New API work-in-progress
 
-Note that I am working on a new API currently called [`pyteamcity.future`](pyteamcity/future) (initially added in [#37](https://github.com/SurveyMonkey/pyteamcity/pull/37)).
+Note that I am working on a new API currently called
+[pyteamcity.future](https://github.com/SurveyMonkey/pyteamcity/blob/master/pyteamcity/future)
+(initially added in
+[#37](https://github.com/SurveyMonkey/pyteamcity/pull/37)).
 
 Goal here is to create a brand new API that is much more flexible and to
 have nicer code that is easier to work with. The old code encourages
@@ -77,8 +80,9 @@ tc.get_agents()
 tc.get_all_plugins()
 ```
 
-You can also look at [sample.py](sample.py) or
-[test_pyteamcity.py](test_pyteamcity.py)
+You can also look at
+[sample.py](https://github.com/SurveyMonkey/pyteamcity/blob/master/sample.py) or
+[test_legacy.py](https://github.com/SurveyMonkey/pyteamcity/blob/master/pyteamcity/legacy/test_legacy.py)
 
 ## Acknowledgements
 
