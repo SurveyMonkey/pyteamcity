@@ -113,6 +113,31 @@ class Build(object):
         return Artifact(build=self)
 
     @property
+    def build_log(self):
+        return self.get_build_log(archived=False, content_length=None)
+
+    def get_build_log(self, archived=False, content_length=None):
+        url = '/downloadBuildLog.html?buildId=%s' % self.id
+        url = self.teamcity.base_url + url
+
+        if archived:
+            url = url + '&archived=true'
+
+        if content_length:
+            res = self.teamcity.session.head(url)
+            raise_on_status(res)
+
+            msg_size = int(res.headers['Content-Length'])
+            if msg_size > content_length:
+                err = 'build.log content-length exceeded (%s > %s)'
+                err = err % (msg_size, content_length)
+                raise exceptions.ArtifactSizeExceeded(err)
+
+        res = self.teamcity.session.get(url)
+        raise_on_status(res)
+        return res.text
+
+    @property
     def pinned(self):
         url = self.teamcity.base_base_url + self.href + '/pin'
         res = self.teamcity.session.get(url=url, headers={'Accept': None})
