@@ -26,6 +26,7 @@ def test_pin():
         responses.PUT,
         tc.relative_url('app/rest/builds/id:1467264/pin'),
         status=204,
+        content_type='text/plain',
     )
 
     build = tc.builds.all().get(id=1467264)

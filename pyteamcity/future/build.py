@@ -114,13 +114,13 @@ class Build(object):
 
     def pin(self, comment):
         url = self.teamcity.base_base_url + self.href + '/pin'
-        res = self.teamcity.session.put(url=url, data=comment)
+        res = self.teamcity.session.put(url=url, data=comment, headers={'Accept': None})
         raise_on_status(res)
         return self
 
     def unpin(self):
         url = self.teamcity.base_base_url + self.href + '/pin'
-        res = self.teamcity.session.delete(url=url)
+        res = self.teamcity.session.delete(url=url, headers={'Accept': None})
         raise_on_status(res)
         return self
 
