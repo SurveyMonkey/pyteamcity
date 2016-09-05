@@ -1,7 +1,7 @@
 from . import exceptions
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
-from .core.utils import parse_date_string
+from .core.utils import parse_date_string, raise_on_status
 from .core.web_browsable import WebBrowsable
 
 from .build_type import BuildType
@@ -91,11 +91,7 @@ class QueuedBuild(WebBrowsable):
             headers={'Content-Type': 'application/xml',
                      'Accept': 'application/json'},
             data=xml)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
 
 
 class QueuedBuildQuerySet(QuerySet):
@@ -144,11 +140,7 @@ class QueuedBuildQuerySet(QuerySet):
             url,
             headers={'Content-Type': 'application/xml'},
             data=data)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
 
         queued_build_data = res.json()
         queued_build = QueuedBuild.from_dict(

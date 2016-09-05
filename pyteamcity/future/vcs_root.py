@@ -1,6 +1,7 @@
 from . import exceptions
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
+from .core.utils import raise_on_status
 
 
 class VCSRoot(object):
@@ -62,11 +63,7 @@ class VCSRoot(object):
     def delete(self):
         url = self.teamcity.base_base_url + self.href
         res = self.teamcity.session.delete(url)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
 
 
 class VCSRootQuerySet(QuerySet):
@@ -138,11 +135,8 @@ class VCSRootQuerySet(QuerySet):
             headers={'Content-Type': 'application/json'},
             allow_redirects=False,
             json=vcs_root_json)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
+
         vcs_root = VCSRoot.from_dict(
             res.json(),
             teamcity=self.teamcity,

@@ -4,7 +4,7 @@ import requests
 
 from . import exceptions
 from .core.manager import Manager
-from .core.utils import parse_date_string
+from .core.utils import parse_date_string, raise_on_status
 
 from .agent import AgentQuerySet
 from .agent_pool import AgentPoolQuerySet
@@ -115,11 +115,7 @@ class TeamCity(object):
     def plugins(self):
         url = self.base_url + '/app/rest/server/plugins'
         res = self.session.get(url)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
         data = res.json()
         plugins = []
         for plugin in data['plugin']:
@@ -135,11 +131,8 @@ class TeamCity(object):
     def server_info(self):
         url = self.base_url + '/app/rest/server'
         res = self.session.get(url)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
+
         data = res.json()
         return TeamCityServerInfo(
             version=data['version'],

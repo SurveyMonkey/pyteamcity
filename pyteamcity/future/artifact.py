@@ -2,7 +2,7 @@ import fnmatch
 import os
 
 from . import exceptions
-from .core.utils import parse_date_string
+from .core.utils import parse_date_string, raise_on_status
 
 
 class Artifact(object):
@@ -12,14 +12,9 @@ class Artifact(object):
         teamcity = self.build.build_query_set.teamcity
         url = self.build.api_url + '/artifacts/metadata/' + self.path
         res = teamcity.session.get(url)
-        if not res.ok:
-            if res.status_code == 404:
-                raise exceptions.ArtifactNotFound(path=path)
-            else:
-                raise exceptions.HTTPError(
-                    status_code=res.status_code,
-                    reason=res.reason,
-                    text=res.text)
+        if res.status_code == 404:
+            raise exceptions.ArtifactNotFound(path=path)
+        raise_on_status(res)
         self._data = res.json()
         self._metadata_url = url
 
@@ -74,11 +69,7 @@ class Artifact(object):
         teamcity = self.build.build_query_set.teamcity
         url = teamcity.base_base_url + self.content_href
         res = teamcity.session.get(url)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
         return res.content
 
     def get_artifact_by_path(self, path):
@@ -95,11 +86,7 @@ class Artifact(object):
         teamcity = self.build.build_query_set.teamcity
         url = self.build.api_url + '/artifacts/children/' + self.path
         res = teamcity.session.get(url)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
         data = res.json()
         ret = []
         for f in data['file']:

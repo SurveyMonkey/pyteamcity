@@ -3,6 +3,7 @@ from .build_type import BuildType
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
 from .core.web_browsable import WebBrowsable
+from .core.utils import raise_on_status
 
 
 class Project(WebBrowsable):
@@ -78,11 +79,7 @@ class Project(WebBrowsable):
     def delete(self):
         url = self.teamcity.base_base_url + self.href
         res = self.teamcity.session.delete(url)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
 
     def create_build_type(self, name):
         """
@@ -94,11 +91,7 @@ class Project(WebBrowsable):
             url=url,
             headers={'Content-Type': 'text/plain'},
             data=name)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
         build_type = BuildType.from_dict(res.json(), teamcity=self.teamcity)
         return build_type
 
@@ -137,10 +130,6 @@ class ProjectQuerySet(QuerySet):
             headers={'Content-Type': 'application/xml'},
             allow_redirects=False,
             data=xml)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
         project = Project.from_dict(res.json(), teamcity=self.teamcity)
         return project

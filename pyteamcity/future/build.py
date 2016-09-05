@@ -3,7 +3,7 @@ from six.moves.urllib.parse import quote
 from . import exceptions
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
-from .core.utils import parse_date_string
+from .core.utils import parse_date_string, raise_on_status
 
 from .agent import Agent
 from .artifact import Artifact
@@ -115,21 +115,13 @@ class Build(object):
     def pin(self, comment):
         url = self.teamcity.base_base_url + self.href + '/pin'
         res = self.teamcity.session.put(url=url, data=comment)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
         return self
 
     def unpin(self):
         url = self.teamcity.base_base_url + self.href + '/pin'
         res = self.teamcity.session.delete(url=url)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
         return self
 
 
