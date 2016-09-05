@@ -112,6 +112,13 @@ class Build(object):
     def artifacts(self):
         return Artifact(build=self)
 
+    @property
+    def pinned(self):
+        url = self.teamcity.base_base_url + self.href + '/pin'
+        res = self.teamcity.session.get(url=url, headers={'Accept': None})
+        raise_on_status(res)
+        return res.text == 'true'
+
     def pin(self, comment):
         url = self.teamcity.base_base_url + self.href + '/pin'
         res = self.teamcity.session.put(url=url, data=comment, headers={'Accept': None})

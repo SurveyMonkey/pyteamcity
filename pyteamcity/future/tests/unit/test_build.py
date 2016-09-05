@@ -23,6 +23,12 @@ def test_pin():
         content_type='application/json',
     )
     responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:1467264/pin'),
+        body='false', status=200,
+        content_type='text/plain',
+    )
+    responses.add(
         responses.PUT,
         tc.relative_url('app/rest/builds/id:1467264/pin'),
         status=204,
@@ -30,15 +36,22 @@ def test_pin():
     )
 
     build = tc.builds.all().get(id=1467264)
+    assert build.pinned is False
     build.pin('marca testing pinning')
 
-    assert len(responses.calls) == 2
-    req1 = responses.calls[0].request
-    assert req1.method == 'GET'
-    assert req1.url == tc.relative_url('app/rest/builds/id:1467264')
-    req2 = responses.calls[1].request
-    assert req2.url == tc.relative_url('app/rest/builds/id:1467264/pin')
-    assert req2.body == 'marca testing pinning'
+    assert len(responses.calls) == 3
+
+    req = responses.calls[0].request
+    assert req.method == 'GET'
+    assert req.url == tc.relative_url('app/rest/builds/id:1467264')
+
+    req = responses.calls[1].request
+    assert req.method == 'GET'
+    assert req.url == tc.relative_url('app/rest/builds/id:1467264/pin')
+
+    req = responses.calls[2].request
+    assert req.url == tc.relative_url('app/rest/builds/id:1467264/pin')
+    assert req.body == 'marca testing pinning'
 
 
 @responses.activate
@@ -93,8 +106,8 @@ def test_unpin():
     req1 = responses.calls[0].request
     assert req1.method == 'GET'
     assert req1.url == tc.relative_url('app/rest/builds/id:1467264')
-    req2 = responses.calls[1].request
-    assert req2.url == tc.relative_url('app/rest/builds/id:1467264/pin')
+    req1 = responses.calls[1].request
+    assert req1.url == tc.relative_url('app/rest/builds/id:1467264/pin')
 
 
 @responses.activate
