@@ -25,6 +25,7 @@ setup(
     maintainer_email='marc@marc-abramowitz.com',
     author='Yotam Oron',
     author_email='yotamoron@yahoo.com',
+    packages=['pyteamcity.legacy'],
     py_modules=['pyteamcity'],
     zip_safe=False,
     install_requires=[
