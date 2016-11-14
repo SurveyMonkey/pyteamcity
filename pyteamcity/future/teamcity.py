@@ -2,7 +2,6 @@ import os
 
 import requests
 
-from . import exceptions
 from .core.manager import Manager
 from .core.utils import parse_date_string, raise_on_status
 
