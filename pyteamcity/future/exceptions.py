@@ -14,6 +14,10 @@ class IllegalOperation(Error):
     pass
 
 
+class ArtifactSizeExceeded(Error):
+    pass
+
+
 class ArtifactNotFound(Error):
     def __init__(self, path):
         self.path = path

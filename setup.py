@@ -34,6 +34,14 @@ setup(
         'requests',
         'six',
     ],
+    extras_require={
+        'tests': [
+            'mock >= 2.0.0',
+            'pytest >= 3.0.2',
+            'pytest-cov >= 2.3.1',
+            'responses >= 0.5.1',
+        ],
+    },
     license='MIT',
     classifiers=[
         'Programming Language :: Python :: 2',

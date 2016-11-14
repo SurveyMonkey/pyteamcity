@@ -1,6 +1,7 @@
 from . import exceptions
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
+from .core.utils import raise_on_status
 
 
 class BuildType(object):
@@ -75,11 +76,7 @@ class BuildType(object):
             headers={'Content-Type': 'text/plain',
                      'Accept': 'text/plain'},
             data='true' if bool else 'false')
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
 
     def reset_build_counter(self, counter):
         url = ''.join([
@@ -91,20 +88,12 @@ class BuildType(object):
             headers={'Content-Type': 'text/plain',
                      'Accept': 'text/plain'},
             data=str(counter))
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
 
     def delete(self):
         url = self.teamcity.base_base_url + self.href
         res = self.teamcity.session.delete(url)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        raise_on_status(res)
 
 
 class BuildTypeQuerySet(QuerySet):

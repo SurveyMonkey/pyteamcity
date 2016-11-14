@@ -23,21 +23,35 @@ def test_pin():
         content_type='application/json',
     )
     responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/builds/id:1467264/pin'),
+        body='false', status=200,
+        content_type='text/plain',
+    )
+    responses.add(
         responses.PUT,
         tc.relative_url('app/rest/builds/id:1467264/pin'),
         status=204,
+        content_type='text/plain',
     )
 
     build = tc.builds.all().get(id=1467264)
+    assert build.pinned is False
     build.pin('marca testing pinning')
 
-    assert len(responses.calls) == 2
-    req1 = responses.calls[0].request
-    assert req1.method == 'GET'
-    assert req1.url == tc.relative_url('app/rest/builds/id:1467264')
-    req2 = responses.calls[1].request
-    assert req2.url == tc.relative_url('app/rest/builds/id:1467264/pin')
-    assert req2.body == 'marca testing pinning'
+    assert len(responses.calls) == 3
+
+    req = responses.calls[0].request
+    assert req.method == 'GET'
+    assert req.url == tc.relative_url('app/rest/builds/id:1467264')
+
+    req = responses.calls[1].request
+    assert req.method == 'GET'
+    assert req.url == tc.relative_url('app/rest/builds/id:1467264/pin')
+
+    req = responses.calls[2].request
+    assert req.url == tc.relative_url('app/rest/builds/id:1467264/pin')
+    assert req.body == 'marca testing pinning'
 
 
 @responses.activate
@@ -92,8 +106,8 @@ def test_unpin():
     req1 = responses.calls[0].request
     assert req1.method == 'GET'
     assert req1.url == tc.relative_url('app/rest/builds/id:1467264')
-    req2 = responses.calls[1].request
-    assert req2.url == tc.relative_url('app/rest/builds/id:1467264/pin')
+    req1 = responses.calls[1].request
+    assert req1.url == tc.relative_url('app/rest/builds/id:1467264/pin')
 
 
 @responses.activate
@@ -578,3 +592,54 @@ def test_dates_with_responses():
     assert build.finish_date.hour == 17
     assert build.finish_date.minute == 28
     assert build.finish_date.second == 2
+
+
+def test_download_build_log():
+    log_content_length = 100
+    response_json = {
+        "id": 1467264,
+        "buildTypeId": "Dummysvc_Branches_Py27",
+        "number": "141",
+        "href": "/httpAuth/app/rest/builds/id:1467264",
+    }
+
+    resp_builds = {
+        'method': responses.GET,
+        'url': tc.relative_url('app/rest/builds/id:1467264'),
+        'json': response_json,
+        'status': 200,
+        'content_type': 'application/json',
+    }
+
+    resp_buildlog = {
+        'url': tc.relative_url('downloadBuildLog.html?buildId=1467264'),
+        'body': 'a' * log_content_length,
+        'status': 200,
+        'match_querystring': True,
+        'content_type': 'text/plain;charset=UTF-8',
+        'adding_headers': {'content-length': str(log_content_length)},
+    }
+
+    resp_archived_buildlog = resp_buildlog.copy()
+    resp_archived_buildlog['url'] += '&archived=true'
+
+    with responses.RequestsMock() as resp:
+        resp.add(**resp_builds)
+        resp.add(**dict(method='GET',  **resp_buildlog))
+
+        build = tc.builds.all().get(id=1467264)
+        assert build.build_log == resp_buildlog['body']
+
+    with responses.RequestsMock() as resp:
+        resp.add(**resp_builds)
+        resp.add(**dict(method='GET',  **resp_archived_buildlog))
+        resp.add(**dict(method='HEAD', **resp_buildlog))
+        resp.add(**dict(method='GET',  **resp_buildlog))
+        resp.add(**dict(method='HEAD', **resp_buildlog))
+
+        build = tc.builds.all().get(id=1467264)
+        assert build.get_build_log(content_length=log_content_length) == resp_buildlog['body']
+        assert build.get_build_log(archived=True) == resp_buildlog['body']
+
+        with pytest.raises(exceptions.ArtifactSizeExceeded):
+            build.get_build_log(content_length=log_content_length - 1)

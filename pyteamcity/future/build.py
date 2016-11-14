@@ -3,7 +3,7 @@ from six.moves.urllib.parse import quote
 from . import exceptions
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
-from .core.utils import parse_date_string
+from .core.utils import parse_date_string, raise_on_status
 
 from .agent import Agent
 from .artifact import Artifact
@@ -112,24 +112,48 @@ class Build(object):
     def artifacts(self):
         return Artifact(build=self)
 
+    @property
+    def build_log(self):
+        return self.get_build_log(archived=False, content_length=None)
+
+    def get_build_log(self, archived=False, content_length=None):
+        url = '/downloadBuildLog.html?buildId=%s' % self.id
+        url = self.teamcity.base_url + url
+
+        if archived:
+            url = url + '&archived=true'
+
+        if content_length:
+            res = self.teamcity.session.head(url)
+            raise_on_status(res)
+
+            msg_size = int(res.headers['Content-Length'])
+            if msg_size > content_length:
+                err = 'build.log content-length exceeded (%s > %s)'
+                err = err % (msg_size, content_length)
+                raise exceptions.ArtifactSizeExceeded(err)
+
+        res = self.teamcity.session.get(url)
+        raise_on_status(res)
+        return res.text
+
+    @property
+    def pinned(self):
+        url = self.teamcity.base_base_url + self.href + '/pin'
+        res = self.teamcity.session.get(url=url, headers={'Accept': None})
+        raise_on_status(res)
+        return res.text == 'true'
+
     def pin(self, comment):
         url = self.teamcity.base_base_url + self.href + '/pin'
-        res = self.teamcity.session.put(url=url, data=comment)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        res = self.teamcity.session.put(url=url, data=comment, headers={'Accept': None})
+        raise_on_status(res)
         return self
 
     def unpin(self):
         url = self.teamcity.base_base_url + self.href + '/pin'
-        res = self.teamcity.session.delete(url=url)
-        if not res.ok:
-            raise exceptions.HTTPError(
-                status_code=res.status_code,
-                reason=res.reason,
-                text=res.text)
+        res = self.teamcity.session.delete(url=url, headers={'Accept': None})
+        raise_on_status(res)
         return self
 
 
