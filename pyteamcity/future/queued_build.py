@@ -1,4 +1,3 @@
-from . import exceptions
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
 from .core.utils import parse_date_string, raise_on_status

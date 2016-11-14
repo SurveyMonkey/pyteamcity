@@ -1,4 +1,3 @@
-from . import exceptions
 from .build_type import BuildType
 from .core.parameter import Parameter
 from .core.queryset import QuerySet
