@@ -136,6 +136,8 @@ class TeamCity:
         self.guest_auth_base_url = "%s://%s:%d/guestAuth" % (
             self.protocol, self.host, self.port)
         if self.username and self.password:
+            self.http_auth_base_url = "%s://%s:%d/httpAuth" % (
+                self.protocol, self.host, self.port)
             self.base_url = "%s://%s:%d/httpAuth/app/rest" % (
                 self.protocol, self.host, self.port)
             self.auth = (self.username, self.password)
@@ -569,7 +571,7 @@ class TeamCity:
         url = _build_url(
             'downloadBuildLog.html?buildId={build_id}'.format(
                 build_id=build_id),
-            base_url=self.guest_auth_base_url)
+            base_url=self.http_auth_base_url)
         return self._get(url)
 
     @GET('vcs-roots')
@@ -629,3 +631,15 @@ class TeamCity:
 
         :param test_locator: test id
         """
+
+    def get_custom_url(self, custom_url):
+        """
+        Gets custom url using HttpAuth in Teamcity.
+        It may be helpfull for all methods in Teamcity API, not presented here
+        For example, smth from http://teamcity/repository/download/
+
+        :param custom_url: url, in format 'repository/download/'
+                           without front /
+        """
+        url = _build_url(custom_url, base_url=self.http_auth_base_url)
+        return self._get(url)
