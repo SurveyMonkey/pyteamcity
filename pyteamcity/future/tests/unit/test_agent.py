@@ -48,6 +48,23 @@ def test_unit_get_all_with_responses():
 
 
 @responses.activate
+def test_unit_delete_agent():
+    agent_json = {'id': 34, 'name': 'tcagent112'}
+    responses.add(
+        responses.GET,
+        tc.relative_url('app/rest/agents/id:34'),
+        json=agent_json, status=200,
+        content_type='application/json',
+    )
+    agent = tc.agents.all().get(id=34)
+    req = agent.delete(dry_run=True)
+    assert req.method == 'DELETE'
+    assert req.headers['Content-Type'] == 'text/plain'
+    assert req.headers['Accept'] == 'text/plain'
+    assert req.url.endswith('/agents/id:34')
+
+
+@responses.activate
 def test_unit_get_by_id_with_responses():
     agent_pools_json = {
         "id": 0,

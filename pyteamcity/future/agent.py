@@ -95,6 +95,17 @@ class Agent(object):
         prepped = self.teamcity.session.prepare_request(req)
         return prepped
 
+    def _delete_request(self, extra_headers):
+        url = self._get_url()
+        headers = dict(self.teamcity.session.headers)
+        headers.update(extra_headers)
+        req = requests.Request(
+          method='DELETE',
+          url=url,
+          headers=headers)
+        prepped = self.teamcity.session.prepare_request(req)
+        return prepped
+
     def _get_url(self):
         return AgentQuerySet(self.teamcity).get(id=self.id, just_url=True)
 
@@ -104,6 +115,13 @@ class Agent(object):
     def disable(self, dry_run=False):
         return self.set_enabled('false', dry_run=dry_run)
 
+    def delete(self, dry_run=False):
+        extra_headers={'Content-Type': 'text/plain',
+                       'Accept': 'text/plain'}
+        req = self._delete_request(extra_headers)
+        if dry_run:
+            return req
+        return self.teamcity.session.send(req)
 
 class AgentQuerySet(QuerySet):
     uri = '/app/rest/agents/'
