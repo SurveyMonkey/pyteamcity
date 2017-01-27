@@ -116,12 +116,13 @@ class Agent(object):
         return self.set_enabled('false', dry_run=dry_run)
 
     def delete(self, dry_run=False):
-        extra_headers={'Content-Type': 'text/plain',
-                       'Accept': 'text/plain'}
+        extra_headers = {'Content-Type': 'text/plain',
+                         'Accept': 'text/plain'}
         req = self._delete_request(extra_headers)
         if dry_run:
             return req
         return self.teamcity.session.send(req)
+
 
 class AgentQuerySet(QuerySet):
     uri = '/app/rest/agents/'
