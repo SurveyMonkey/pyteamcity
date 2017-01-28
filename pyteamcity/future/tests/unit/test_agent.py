@@ -56,12 +56,19 @@ def test_unit_delete_agent():
         json=agent_json, status=200,
         content_type='application/json',
     )
+    responses.add(
+        responses.DELETE,
+        tc.relative_url('app/rest/agents/id:34'),
+        json=agent_json, status=204,
+        content_type='application/json',
+    )
     agent = tc.agents.all().get(id=34)
     req = agent.delete(dry_run=True)
     assert req.method == 'DELETE'
     assert req.headers['Content-Type'] == 'text/plain'
     assert req.headers['Accept'] == 'text/plain'
     assert req.url.endswith('/agents/id:34')
+    agent.delete()
 
 
 @responses.activate
