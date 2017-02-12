@@ -25,7 +25,7 @@ setup(
     maintainer_email='marc@marc-abramowitz.com',
     author='Yotam Oron',
     author_email='yotamoron@yahoo.com',
-    packages=['pyteamcity', 'pyteamcity.legacy', 'pyteamcity.future'],
+    packages=['pyteamcity', 'pyteamcity.legacy', 'pyteamcity.future', 'pyteamcity.future.core'],
     zip_safe=False,
     install_requires=[
         'beautifulsoup4',
