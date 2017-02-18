@@ -26,3 +26,6 @@ coverage.xml
 
 #Mr Developer
 .mr.developer.cfg
+
+# IDE
+.idea
