@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 version = '0.1.1'
 
@@ -25,7 +25,7 @@ setup(
     maintainer_email='marc@marc-abramowitz.com',
     author='Yotam Oron',
     author_email='yotamoron@yahoo.com',
-    packages=['pyteamcity', 'pyteamcity.legacy'],
+    packages=find_packages(),
     zip_safe=False,
     install_requires=[
         'beautifulsoup4',
