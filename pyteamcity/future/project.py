@@ -132,3 +132,34 @@ class ProjectQuerySet(QuerySet):
         raise_on_status(res)
         project = Project.from_dict(res.json(), teamcity=self.teamcity)
         return project
+
+    def get_child_project(self, parent_project_id):
+        id = 'id:' + parent_project_id
+        url = self.base_url+id
+        res = self.teamcity.session.get(url=url,headers={'Content-Type': 'application/xml'},allow_redirects=False)
+        raise_on_status(res)
+
+        ## need inicialise all projects in json request
+        projects = []
+        try:
+            for p in res.json()['projects']['project']:
+                projects.append(Project.from_dict(p, teamcity=self.teamcity))
+
+        except KeyError:
+            ## if not child projects return self project
+
+            if res.json()['projects']['count'] == 0:
+                projects.append(Project(id=res.json()['id'],
+                                        name=res.json()['name'],
+                                        description='',
+                                        href=res.json()['href'],
+                                        web_url=res.json()['webUrl'],
+                                        parent_project_id=res.json()['parentProject'],
+                                        project_query_set = None,
+                                        teamcity=self.teamcity))
+
+
+        except Exception as e:
+            print('Unknow exception: ', e)
+
+        return projects
