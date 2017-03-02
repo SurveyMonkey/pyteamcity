@@ -296,7 +296,7 @@ class TeamCity:
         :param change_id: the change to get, in the format [0-9]+
         """
 
-    @GET('changes/build:id:{build_id}')
+    @GET('changes/?locator=build:id:{build_id}')
     def get_changes_by_build_id(self, build_id):
         """
         Gets changes in a build for a build ID `build_id`.
