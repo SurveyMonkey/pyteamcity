@@ -1,3 +1,4 @@
+from .change_details import ChangeDetails
 from .core.queryset import QuerySet
 from .core.utils import parse_date_string
 
@@ -13,12 +14,23 @@ class Change(object):
         self.date_str = date_str
         self.href = href
         self.web_url = web_url
-        self.query_set = query_set
+        self.change_query_set = query_set
         self._data_dict = data_dict
+
+    @property
+    def api_url(self):
+        teamcity = self.change_query_set.teamcity
+        base_url = teamcity.base_url
+        url = base_url + '/app/rest/changes/id:%s' % self.id
+        return url
 
     @property
     def date(self):
         return parse_date_string(self.date_str)
+
+    @property
+    def details(self):
+        return ChangeDetails(change=self)
 
     def __repr__(self):
         return '<%s.%s: id=%r version=%r username=%r date=%r>' % (
@@ -46,6 +58,7 @@ class Change(object):
 class ChangeQuerySet(QuerySet):
     uri = '/app/rest/changes/'
     _entity_factory = Change
+    entityName = 'change'
 
     def filter(self,
                id=None,
@@ -75,5 +88,8 @@ class ChangeQuerySet(QuerySet):
         return self
 
     def __iter__(self):
+        data = self._data()
+        if self.entityName not in data:
+            return iter(())
         return (self.__class__._entity_factory.from_dict(d, self)
-                for d in self._data()['change'])
+                for d in data[self.entityName])

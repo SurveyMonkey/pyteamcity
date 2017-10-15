@@ -72,10 +72,10 @@ class QuerySet(object):
             raise exceptions.MultipleObjectsReturned()
         self._data_dict = None
         if just_url:
-            return self._get_url(details=True)
+            return self._get_url(details=False)
         else:
             return self.__class__._from_dict(
-                self._data(details=True), self)
+                self._data(details=False), self)
 
     def __len__(self):
         data = self._data()
