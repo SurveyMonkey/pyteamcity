@@ -26,6 +26,14 @@ class ArtifactNotFound(Error):
         return 'Artifact not found: %s' % self.path
 
 
+class ChangeDetailsNotFound(Error):
+    def __init__(self, id):
+        self.iud = id
+
+    def __str__(self):
+        return 'Change details not found: %s' % self.id
+
+
 class HTTPError(Error):
     def __init__(self, status_code, reason, text):
         self.status_code = status_code
