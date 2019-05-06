@@ -462,6 +462,12 @@ class TeamCity:
         Gets all agents in the TeamCity server pointed to by this instance of
         the Client.
         """
+        
+    @GET('agents?locator=connected:false')
+    def get_disconnected_agents(self):
+        """
+        Get all disconnected agents
+        """
 
     @GET('agents/id:{agent_id}')
     def get_agent_by_agent_id(self, agent_id):
