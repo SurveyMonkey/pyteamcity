@@ -9,6 +9,8 @@ Python interface to the [REST
 API](https://confluence.jetbrains.com/display/TCD9/REST+API) of
 [TeamCity](https://www.jetbrains.com/teamcity/)
 
+License: MIT (see [`LICENSE`](LICENSE))
+
 ## Installation
 
 ```
