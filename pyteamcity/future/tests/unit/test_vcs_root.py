@@ -101,7 +101,7 @@ def test_unit_create_vcs_root_with_responses():
     responses.add(
         responses.POST,
         tc.relative_url('app/rest/vcs-roots/'),
-        status=500, body='Internal error',
+        status=500, body='Internal Server Error',
     )
     with pytest.raises(exceptions.HTTPError) as excinfo:
         tc.vcs_roots.all().create(
@@ -110,7 +110,7 @@ def test_unit_create_vcs_root_with_responses():
             url=vcs_url,
             branch='master',
         )
-    assert str(excinfo.value) == 'Internal error'
+    assert str(excinfo.value) == 'Internal Server Error'
 
     # Simulate success creating a VCSRoot
     response_json = {
