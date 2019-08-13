@@ -1,11 +1,11 @@
 language: python
+python: 3.6
 sudo: false
 env:
   - TOXENV=py26
   - TOXENV=py27
-  - TOXENV=py33
-  - TOXENV=py34
-  - TOXENV=pypy
+  - TOXENV=py35
+  - TOXENV=py36
   - TOXENV=flake8
 install:
   - travis_retry pip install python-coveralls
