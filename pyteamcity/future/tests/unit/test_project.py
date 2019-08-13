@@ -25,11 +25,11 @@ def test_unit_create_project_with_responses():
     responses.add(
         responses.POST,
         tc.relative_url('app/rest/projects/'),
-        status=500, body='Internal error',
+        status=500, body='Internal Server Error',
     )
     with pytest.raises(exceptions.HTTPError) as excinfo:
         tc.projects.all().create(name='foo')
-    assert str(excinfo.value) == 'Internal error'
+    assert str(excinfo.value) == 'Internal Server Error'
 
     # Simulate success creating a project
     response_json = {
