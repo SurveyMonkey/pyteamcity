@@ -1,6 +1,7 @@
 import os
 
 import requests
+from requests.auth import AuthBase
 
 from .core.manager import Manager
 from .core.utils import parse_date_string, raise_on_status
@@ -34,9 +35,29 @@ class Plugin(object):
         )
 
 
+class TokenAuth(AuthBase):
+    """Token Authentication to the given Request object."""
+
+    def __init__(self, token):
+        self.token = token
+
+    def __eq__(self, other):
+        return all([
+            self.token == getattr(other, 'token', None)
+        ])
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __call__(self, r):
+        r.headers['Authorization'] = f"Bearer {self.token}"
+        return r
+
+
 class TeamCity(object):
     username = None
     password = None
+    token = None
     server = None
     port = None
     protocol = None
@@ -46,14 +67,14 @@ class TeamCity(object):
     def __init__(self,
                  username=None, password=None,
                  protocol='http', server='127.0.0.1', port=None,
-                 session=None):
+                 session=None, token=None):
         self.username = username
         self.password = password
         self.protocol = protocol
         self.server = server
         self.port = port or (443 if protocol == 'https' else 80)
         self.session = session or requests.Session()
-        self.session.auth = (username, password)
+        self.token = token
         self.session.headers['Accept'] = 'application/json'
         self.projects = Manager(
             teamcity=self,
@@ -93,7 +114,10 @@ class TeamCity(object):
         if self.protocol == 'https' and self.port != 443:
             self.base_base_url += ':%d' % self.port
 
-        if self.username and self.password:
+        if token:
+            self.base_url = self.base_base_url
+            self.session.auth = TokenAuth(self.token)
+        elif self.username and self.password:
             self.base_url = self.base_base_url + '/httpAuth'
             self.auth = (self.username, self.password)
         else:
