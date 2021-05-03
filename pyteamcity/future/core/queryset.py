@@ -21,7 +21,7 @@ class QuerySet(object):
 
     def _get_url(self, details=False, href=None):
         if href is not None:
-            return 'http://' + self.teamcity.server + href
+            return self.teamcity.base_url + href
 
         url = self.base_url
 
