@@ -1,4 +1,6 @@
 from six.moves.urllib.parse import quote
+import tempfile
+import os
 
 from . import exceptions
 from .core.parameter import Parameter
@@ -8,7 +10,10 @@ from .core.utils import parse_date_string, raise_on_status
 from .agent import Agent
 from .artifact import Artifact
 from .build_type import BuildTypeQuerySet
+from .project import ProjectQuerySet
 from .user import User
+from .build_statistics import BuildStatistics
+from .test_occurrences import TestOccurrences
 
 
 class Build(object):
@@ -34,9 +39,19 @@ class Build(object):
         self._data_dict = data_dict
 
     @property
+    def data(self):
+        return self._data_dict
+
+    @property
     def user(self):
         if 'user' in self._data_dict.get('triggered', {}):
             return User.from_dict(self._data_dict['triggered']['user'])
+
+    @property
+    def dependencies(self):
+        if 'build' in self._data_dict.get('snapshot-dependencies', {}):
+            return [Build.from_dict(b) for b in self._data_dict['snapshot-dependencies']['build']]
+        return []
 
     @property
     def queued_date(self):
@@ -44,11 +59,26 @@ class Build(object):
 
     @property
     def start_date(self):
+        if self.state == "queued":
+            return parse_date_string(self._data_dict.get("startEstimate", None))
         return parse_date_string(self.start_date_string)
 
     @property
     def finish_date(self):
-        return parse_date_string(self.finish_date_string)
+        #running build there will not be finish date
+        return parse_date_string(self.finish_date_string) if self.finish_date_string  else None
+    
+    @property
+    def status_text(self):
+        return self._data_dict.get('statusText')
+    
+    @property
+    def wait_reason(self):
+        return self._data_dict.get('waitReason', "")
+    
+    @property
+    def test_occurances(self):
+        return TestOccurrences.from_dict(self.id, self._data_dict.get('testOccurrences', {}))
 
     @property
     def agent(self):
@@ -61,6 +91,13 @@ class Build(object):
         build_type = BuildTypeQuerySet(teamcity).get(id=build_type_id)
 
         return build_type
+    
+    @property
+    def project(self):
+        teamcity = self.build_query_set.teamcity
+        project_id = self._data_dict.get('buildType', {}).get('projectId')
+        return ProjectQuerySet(teamcity).get(id=project_id) if project_id else None
+    
 
     def __repr__(self):
         return '<%s.%s: id=%r build_type_id=%r number=%r>' % (
@@ -69,6 +106,19 @@ class Build(object):
             self.id,
             self.build_type_id,
             self.number)
+
+    def _update_dict(self, d):
+        self.id=d.get('id', self.id)
+        self.number=d.get('number', self.number)
+        self.queued_date_string=d.get('queuedDate', self.queued_date_string)
+        self.start_date_string=d.get('startDate', self.start_date_string)
+        self.finish_date_string=d.get('finishDate', self.finish_date_string)
+        self.build_type_id=d.get('buildTypeId', self.build_type_id)
+        self.state=d.get('state', self.state)
+        self.status=d.get('status', self.status)
+        self.branch_name=d.get('branchName', self.branch_name)
+        self.href=d.get('href', self.href)
+        self._data_dict=d if d else self._data_dict
 
     @classmethod
     def from_dict(cls, d, build_query_set=None, teamcity=None):
@@ -136,7 +186,40 @@ class Build(object):
         res = self.teamcity.session.get(url)
         raise_on_status(res)
         return res.text
+    
+    def get_build_log_file(self, archived=False):
+        url = '/downloadBuildLog.html?buildId=%s' % self.id
+        url = self.teamcity.base_url + url
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_dir = tmp
+        
+        os.makedirs(tmp_dir)
+        log_file = os.path.join(tmp_dir, "tc_log_" + str(self.id))
+        
+        if archived:
+            url = url + '&archived=true'
+        with self.teamcity.session.get(url, stream=True) as res:
+            raise_on_status(res)
+            with open(log_file, 'wb') as f:
+                for chunk in res.iter_content(chunk_size=8192):
+                    # If you have chunk encoded response uncomment if
+                    # and set chunk_size parameter to None.
+                    f.write(chunk)
+        
+        return log_file
 
+    def refresh(self):
+        res = self.teamcity.session.get(self.api_url)
+        raise_on_status(res)
+        data = res.json() 
+        return self._update_dict(data)
+    
+    def statistics(self):
+        res = self.teamcity.session.get(self.api_url+"/statistics")
+        raise_on_status(res)
+        data = res.json() 
+        return BuildStatistics.from_dict(self.id, data)
+        
     @property
     def pinned(self):
         url = self.teamcity.base_base_url + self.href + '/pin'
@@ -167,9 +250,11 @@ class BuildQuerySet(QuerySet):
                build_type=None, number=None, branch=None, user=None,
                tags=None, pinned=None,
                since_build=None, since_date=None, status=None,
+               start_date_from=None, finish_date_from=None,
                agent_name=None, personal=None,
                canceled=None, failed_to_start=None, running=None,
-               start=None, count=None, lookup_limit=None):
+               start=None, count=None, lookup_limit=None,
+               default_filter=None, snapshots_from=None, snapshots_to=None):
         if id is not None:
             self._add_pred('id', id)
         if project is not None:
@@ -213,6 +298,16 @@ class BuildQuerySet(QuerySet):
             self._add_pred('count', count)
         if lookup_limit is not None:
             self._add_pred('lookupLimit', lookup_limit)
+        if default_filter is not None:
+            self._add_pred('defaultFilter', default_filter)
+        if snapshots_from is not None:
+            self._add_pred('snapshotDependency', "(from:%s)" % snapshots_from)
+        if snapshots_to is not None:
+            self._add_pred('snapshotDependency', "(to:%s)" % snapshots_to)
+        if start_date_from is not None:
+            self._add_pred('startDate', "(date:%s,condition:after)" % self._get_since_date(start_date_from))
+        if finish_date_from is not None:
+            self._add_pred('finishDate', "(date:%s,condition:after)" % self._get_since_date(finish_date_from))
         return self
 
     def _get_since_date(self, since_date):

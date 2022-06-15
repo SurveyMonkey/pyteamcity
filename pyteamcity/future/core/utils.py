@@ -1,9 +1,12 @@
 import dateutil.parser
+from datetime import timezone
 
 from .. import exceptions
 
 
 def parse_date_string(date_string):
+    if date_string is None:
+        return None
     return dateutil.parser.parse(date_string)
 
 
